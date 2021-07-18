@@ -101,9 +101,11 @@
 		B220EEA726A4A25300971BAC /* pokedex */ = {
 			isa = PBXGroup;
 			children = (
+				B220EEDD26A4A30700971BAC /* Views */,
+				B220EEDC26A4A2FD00971BAC /* Models */,
+				B220EEDB26A4A2E900971BAC /* ViewControllers */,
 				B220EEA826A4A25300971BAC /* AppDelegate.swift */,
 				B220EEAA26A4A25300971BAC /* SceneDelegate.swift */,
-				B220EEAC26A4A25300971BAC /* ViewController.swift */,
 				B220EEAE26A4A25300971BAC /* Main.storyboard */,
 				B220EEB426A4A25500971BAC /* Assets.xcassets */,
 				B220EEB626A4A25500971BAC /* LaunchScreen.storyboard */,
@@ -129,6 +131,28 @@
 				B220EECF26A4A25500971BAC /* Info.plist */,
 			);
 			path = pokedexUITests;
+			sourceTree = "<group>";
+		};
+		B220EEDB26A4A2E900971BAC /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				B220EEAC26A4A25300971BAC /* ViewController.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		B220EEDC26A4A2FD00971BAC /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		B220EEDD26A4A30700971BAC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
