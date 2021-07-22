@@ -74,7 +74,6 @@ class ViewController: UIViewController {
             }
         }// end of getPokemonList
         
-        
        
         
         group.notify(queue: .main) {

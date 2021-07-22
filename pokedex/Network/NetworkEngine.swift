@@ -91,9 +91,6 @@ class NetworkEngine{
                     let pokemonDetails = try self.pokemonDecoder.decode(PokemonDetails.self, from: data!)
                     completed(.success(pokemonDetails))
 
-                    // do several api calls from pokemon details to get further info
-
-
                 }catch{
                     print("JSON Error \(error.localizedDescription)")
                     print(error)
@@ -101,8 +98,6 @@ class NetworkEngine{
                 }
 
             }.resume()
-            
-            
             
         }
         
