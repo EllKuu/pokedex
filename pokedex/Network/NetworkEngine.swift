@@ -10,26 +10,23 @@ import Foundation
 class NetworkEngine{
     
     static let shared = NetworkEngine()
-    private let baseUrl = "https://pokeapi.co/api/v2/pokemon?limit=898&offset=0"
+    private let baseUrl = "https://pokeapi.co/api/v2/pokemon?limit=150&offset=0"
     
     private let pokemonResourceUrl = "https://pokeapi.co/api/v2/pokemon/{id or name}"
     private let pokemonSpeciesUrl = "https://pokeapi.co/api/v2/pokemon-species/{id}"
     private let pokemonEvolutionsUrl = "https://pokeapi.co/api/v2/evolution-chain/{id}"
-    
-    /* idea: setup other functions to get data when url
-     -return in success case one pokemon detail object with all values needed
-     -use dispatch group in api caller so it ony returns success case after all process have completed.
-     
-     */
+
     
     let session = URLSession.shared
     let pokemonDecoder = JSONDecoder()
+    let resultQueue: DispatchQueue = .main
     
-    func getPokemonList(completed: @escaping (Result<Pokemon, PokemonError>) -> Void){
+    func getPokemonList(completed: @escaping (Result<PokemonList, PokemonError>) -> Void){
         
         //1: create HTTP request
         let url = URL(string: baseUrl)!
         
+       let semaphore = DispatchSemaphore(value: 0)
         //2: make the request
         let task = session.dataTask(with: url) { data, response, error in
            
@@ -51,26 +48,28 @@ class NetworkEngine{
            // decode the JSON
             do{
     
-                let pokemonResult = try self.pokemonDecoder.decode(Pokemon.self, from: data!)
-                //print(pokemonResult.results) sends back 1 object with neted list of all pokemon in it
-                completed(.success(pokemonResult))
+                let pokemonResult = try self.pokemonDecoder.decode(PokemonList.self, from: data!)
+                    completed(.success(pokemonResult))
             }
             catch{
                 print("JSON Error \(error.localizedDescription)")
                 completed(.failure(.invalidData))
                 
             }
+            semaphore.signal()
         }
         task.resume()
+        _ = semaphore.wait(wallTimeout: .distantFuture)
     
     }// end of getPokemonList
     
     
-    func getPokemonDetails(pokemonList: Pokemon, completed: @escaping(Result<PokemonDetails, PokemonError>) -> Void){
-        // use url to get pokemon details
+    func getPokemonDetails(pokemonList: PokemonList, completed: @escaping(Result<[PokemonDetails], PokemonError>) -> Void){
         
-        for (index, pokemon) in pokemonList.results.enumerated(){
-            //print(poke.url)
+        var pokemonDetailsArray = [PokemonDetails]()
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        for pokemon in pokemonList.results{
             guard let pokemonUrl = pokemon.url else { continue }
             let newUrl = URL(string: pokemonUrl)
             
@@ -87,83 +86,104 @@ class NetworkEngine{
                 }
 
                 do{
-                    
                     let pokemonDetails = try self.pokemonDecoder.decode(PokemonDetails.self, from: data!)
-                    completed(.success(pokemonDetails))
+                    pokemonDetailsArray.append(pokemonDetails)
+                    //completed(.success(pokemonDetailsArray))
 
                 }catch{
                     print("JSON Error \(error.localizedDescription)")
                     print(error)
                     completed(.failure(.invalidData))
                 }
-
+                semaphore.signal()
             }.resume()
+            _ = semaphore.wait(wallTimeout: .distantFuture)
             
         }
+        completed(.success(pokemonDetailsArray))
         
     } // end of getPokemonDetails
     
     
-    func getPokemonSpeciesDetails(speciesUrl: String, completed: @escaping( Result<PokemonSpecies, PokemonError>) -> Void){
+    func getPokemonSpeciesDetails(speciesList: [PokemonDetails], completed: @escaping( Result<[PokemonSpecies], PokemonError>) -> Void){
         
-        //guard let urlString = speciesUrl else { return }
-        //print(speciesUrl)
+        var pokemonSpeciesArray = [PokemonSpecies]()
+        let semaphore = DispatchSemaphore(value: 0)
         
-        let pokemonSpeciesUrl = URL(string: speciesUrl)
-        
-        session.dataTask(with: pokemonSpeciesUrl!) { data, response, error in
-            if error != nil {
-                print(error as Any)
-                completed(.failure(.unableToComplete))
-                return
-            }
-            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else{
+        for pokemon in speciesList{
+            let pokemonSpeciesUrl = URL(string: pokemon.species.url)
+            
+            
+            session.dataTask(with: pokemonSpeciesUrl!) { data, response, error in
+                if error != nil {
+                    print(error as Any)
+                    completed(.failure(.unableToComplete))
+                    return
+                }
+                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else{
+                    
+                    completed(.failure(.invalidData))
+                    return
+                }
                 
-                completed(.failure(.invalidData))
-                return
-            }
-            
-            do{
-                let pokemonSpecies = try self.pokemonDecoder.decode(PokemonSpecies.self, from: data!)
-                completed(.success(pokemonSpecies))
-            }catch {
-                print("JSON Error \(error.localizedDescription)")
-                print(error)
-                completed(.failure(.invalidData))
-            }
+                do{
+                    let pokemonSpecies = try self.pokemonDecoder.decode(PokemonSpecies.self, from: data!)
+                    pokemonSpeciesArray.append(pokemonSpecies)
+                   
+                }catch {
+                    print("JSON Error \(error.localizedDescription)")
+                    print(error)
+                    completed(.failure(.invalidData))
+                }
+                semaphore.signal()
 
-        }.resume()
-            
-        
+            }.resume()
+            _ = semaphore.wait(wallTimeout: .distantFuture)
+        }
+        completed(.success(pokemonSpeciesArray))
     } // end of getPokemonSpeciesDetails
     
-    func getPokemonEvolutionChain(pokemonEvolutionUrl: String, completed: @escaping(Result<PokemonEvolutions, PokemonError>) -> Void){
+    
+    func getPokemonEvolutionChain(pokemonEvolutionList: [PokemonSpecies], completed: @escaping(Result<[PokemonEvolutions], PokemonError>) -> Void){
         
-        let evolutionUrl = URL(string: pokemonEvolutionUrl)
+        var pokemonEvolutionArray = [PokemonEvolutions]()
+        let semaphore = DispatchSemaphore(value: 0)
+       
         
-        session.dataTask(with: evolutionUrl!) { data, response, error in
-            if error != nil {
-                print(error as Any)
-                completed(.failure(.unableToComplete))
-                return
-            }
-            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else{
-                
-                completed(.failure(.invalidData))
-                return
-            }
+        for pokemon in pokemonEvolutionList{
             
-            do{
-                let pokemonEvolutionChain = try self.pokemonDecoder.decode(PokemonEvolutions.self, from: data!)
-                completed(.success(pokemonEvolutionChain))
-            }catch {
-                print("JSON Error \(error.localizedDescription)")
-                print(error)
-                completed(.failure(.invalidData))
-            }
-
-        }.resume()
-    } // end of getPokemonEvolutionChain
+            let evolutionUrl = URL(string: pokemon.evolution_chain.url)
+            
+            session.dataTask(with: evolutionUrl!) { data, response, error in
+                if error != nil {
+                    print(error as Any)
+                    completed(.failure(.unableToComplete))
+                    return
+                }
+                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else{
+                    
+                    completed(.failure(.invalidData))
+                    return
+                }
+                
+                do{
+                    let pokemonEvolutionChain = try self.pokemonDecoder.decode(PokemonEvolutions.self, from: data!)
+                    pokemonEvolutionArray.append(pokemonEvolutionChain)
+                    
+                }catch {
+                    print("JSON Error \(error.localizedDescription)")
+                    print(error)
+                    completed(.failure(.invalidData))
+                }
+                semaphore.signal()
+            }.resume()
+            _ = semaphore.wait(wallTimeout: .distantFuture)
+        } // end of getPokemonEvolutionChain
+        completed(.success(pokemonEvolutionArray))
+        
+    }
+        
+       
     
     
     

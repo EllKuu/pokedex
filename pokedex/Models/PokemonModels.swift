@@ -9,7 +9,7 @@ import Foundation
 
 
 /* Model for Pokemon list endpoint */
-class Pokemon: Codable{
+class PokemonList: Codable{
         let results: [Results]
    
     struct Results: Codable{
