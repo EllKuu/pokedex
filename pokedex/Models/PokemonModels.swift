@@ -90,6 +90,7 @@ class PokemonEvolutions: Codable{
     }
     
     struct ChainLink: Codable {
+        let evolves_to: [ChainLink]
         let species: Species
     }
     
