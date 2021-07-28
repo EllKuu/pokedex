@@ -90,7 +90,7 @@ class ViewController: UIViewController {
             }
         }// end of getPokemonList
         
-        self.view.backgroundColor = .blue
+        self.view.backgroundColor = .red
 
         
     }// end of view did load
@@ -99,18 +99,19 @@ class ViewController: UIViewController {
         if isWaiting{
             print("API running")
         }else{
-            self.view.backgroundColor = .red
-            print(self.pokemonListResult)
-            print(self.pokemonDetailsArray.count)
+            self.view.backgroundColor = .green
+            //print(self.pokemonListResult)
+           // print(self.pokemonDetailsArray.count)
             print(self.pokemonSpeciesDetailsArray.count)
-            //print(self.pokemonEvolutionDetailsArray)
             
-            for p in self.pokemonEvolutionDetailsArray{
-                print(p.chain)
+            for p in pokemonSpeciesDetailsArray{
+                print(p.generation, p.name)
             }
+            
+            //print(self.pokemonEvolutionDetailsArray.count)
         }
        
-    }
+    }// end of UpdateUI
     
     
 }
