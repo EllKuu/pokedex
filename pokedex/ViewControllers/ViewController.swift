@@ -38,59 +38,31 @@ class ViewController: UIViewController {
                 switch result{
                 case .success(let pokemonDetails):
                     strongSelf.pokemonListResult = pokemonDetails
+                    
+                    
+                    // Get pokemon Details from PokemonList
                     NetworkEngine.shared.getPokemonDetails(pokemonList: pokemonDetails) { [weak self] result in
                         guard let strongSelf = self else { return }
-                        
+
                         DispatchQueue.main.async {
                             switch result{
                             case .success(let pokemonDetails):
                                 strongSelf.pokemonDetailsArray = pokemonDetails
-                                
-                                
-                                // get species details
-                                NetworkEngine.shared.getPokemonSpeciesDetails(speciesList: pokemonDetails) { [weak self] result in
-                                    guard let strongSelf = self else { return }
-                                    
-                                    DispatchQueue.main.async {
-                                        switch result{
-                                        case.success(let pokemonSpecies):
-                                            strongSelf.pokemonSpeciesDetailsArray = pokemonSpecies
-                                            
-                                            NetworkEngine.shared.getPokemonEvolutionChain(pokemonEvolutionList: pokemonSpecies) { [weak self] result in
-                                                guard let strongSelf = self else { return }
-                                                DispatchQueue.main.async {
-                                                    switch result{
-                                                    case .success(let pokemonEvolutions):
-                                                        strongSelf.pokemonEvolutionDetailsArray = pokemonEvolutions
-                                                        strongSelf.isWaiting = false
-                                                        
-                                                    case .failure(let error):
-                                                        print(error)
-                                                    }
-                                                    
-                                                }
-                                            }
-                                            
-                                            
-                                        case .failure(let error):
-                                            print(error)
-                                        }
-                                    }
-                                    
-                                }
+                                strongSelf.isWaiting = false
+
                             case .failure(let error):
-                                print(error.rawValue)
+                                print("Details - \(error.rawValue)")
                             }
                         }
                     }// end of getPokemonDetails
                 
                 case .failure(let error):
-                    print(error.rawValue)
+                    print("PokemonList - \(error.rawValue)")
                 }
             }
         }// end of getPokemonList
         
-        self.view.backgroundColor = .blue
+        self.view.backgroundColor = .red
 
         
     }// end of view did load
@@ -99,19 +71,17 @@ class ViewController: UIViewController {
         if isWaiting{
             print("API running")
         }else{
-            self.view.backgroundColor = .red
-            print(self.pokemonListResult)
-            print(self.pokemonDetailsArray.count)
-            print(self.pokemonSpeciesDetailsArray.count)
-            //print(self.pokemonEvolutionDetailsArray)
-            
-            for p in self.pokemonEvolutionDetailsArray{
-                print(p.chain)
-            }
+            self.view.backgroundColor = .green
+            print(self.pokemonListResult?.results.count)
+            //print(self.pokemonDetailsArray)
+//            for p in self.pokemonDetailsArray {
+//                print(p.name, p.types)
+//            }
+
         }
        
     }
     
     
-}
+} // end of class VC
 

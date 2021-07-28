@@ -10,16 +10,15 @@ import Foundation
 class NetworkEngine{
     
     static let shared = NetworkEngine()
-    private let baseUrl = "https://pokeapi.co/api/v2/pokemon?limit=1&offset=0"
+    private let baseUrl = "https://pokeapi.co/api/v2/pokemon?limit=898&offset=0"
     
     private let pokemonResourceUrl = "https://pokeapi.co/api/v2/pokemon/{id or name}"
     private let pokemonSpeciesUrl = "https://pokeapi.co/api/v2/pokemon-species/{id}"
     private let pokemonEvolutionsUrl = "https://pokeapi.co/api/v2/evolution-chain/{id}"
-
+    
     
     let session = URLSession.shared
     let pokemonDecoder = JSONDecoder()
-    let resultQueue: DispatchQueue = .main
     
     func testFunc(){
         for i in 1...5{
@@ -34,11 +33,10 @@ class NetworkEngine{
         
         //2: make the request
         let task = session.dataTask(with: url) { data, response, error in
-           
+            
             // check errors
             if error != nil {
                 completed(.failure(.unableToComplete))
-                return
             }
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else{
                 completed(.failure(.invalidData))
@@ -50,11 +48,11 @@ class NetworkEngine{
                 return
             }
             
-           // decode the JSON
+            // decode the JSON
             DispatchQueue.main.async {
                 do{
                     let pokemonResult = try self.pokemonDecoder.decode(PokemonList.self, from: data!)
-                        completed(.success(pokemonResult))
+                    completed(.success(pokemonResult))
                 }
                 catch{
                     print("JSON Error \(error.localizedDescription)")
@@ -63,20 +61,24 @@ class NetworkEngine{
             }
         }
         task.resume()
-    
+        
     }// end of getPokemonList
     
     
     func getPokemonDetails(pokemonList: PokemonList, completed: @escaping(Result<[PokemonDetails], PokemonError>) -> Void){
         
         var pokemonDetailsArray = [PokemonDetails]()
+        let listCount = pokemonList.results.count
+        var counter = 0
+        
+        print("List Count: \(listCount)")
         
         for pokemon in pokemonList.results{
             guard let pokemonUrl = pokemon.url else { continue }
             let newUrl = URL(string: pokemonUrl)
             
             session.dataTask(with: newUrl!) { data, response, error in
-
+                
                 if error != nil {
                     //print(error as Any)
                     completed(.failure(.unableToComplete))
@@ -87,115 +89,91 @@ class NetworkEngine{
                     return
                 }
                 
-                
                 DispatchQueue.main.async {
                     do{
                         let pokemonDetails = try self.pokemonDecoder.decode(PokemonDetails.self, from: data!)
                         pokemonDetailsArray.append(pokemonDetails)
-                        //completed(.success(pokemonDetailsArray))
+                        counter += 1
                         
+                        if counter == listCount{
+                            completed(.success(pokemonDetailsArray))
+                        }
                     }catch{
                         print("JSON Error \(error.localizedDescription)")
-                        print(error)
                         completed(.failure(.invalidData))
                     }
-                    completed(.success(pokemonDetailsArray))
-                    }
+                    
+                    
+                }
             }.resume()
-           
-        
         }
-               
-        
     } // end of getPokemonDetails
     
     
-    func getPokemonSpeciesDetails(speciesList: [PokemonDetails], completed: @escaping( Result<[PokemonSpecies], PokemonError>) -> Void){
+    func getPokemonSpeciesDetails(pokemonSpecies: PokemonDetails, completed: @escaping( Result<PokemonSpecies, PokemonError>) -> Void){
         
-        var pokemonSpeciesArray = [PokemonSpecies]()
+        let pokemonSpeciesUrl = URL(string: pokemonSpecies.species.url)
         
-        for pokemon in speciesList{
-            let pokemonSpeciesUrl = URL(string: pokemon.species.url)
+        
+        session.dataTask(with: pokemonSpeciesUrl!) { data, response, error in
+            if error != nil {
+                print(error as Any)
+                completed(.failure(.unableToComplete))
+                return
+            }
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else{
+                
+                completed(.failure(.invalidData))
+                return
+            }
             
-            
-            session.dataTask(with: pokemonSpeciesUrl!) { data, response, error in
-                if error != nil {
-                    print(error as Any)
-                    completed(.failure(.unableToComplete))
-                    return
-                }
-                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else{
+            DispatchQueue.main.async {
+                do{
+                    let pokemonSpecies = try self.pokemonDecoder.decode(PokemonSpecies.self, from: data!)
                     
+                    completed(.success(pokemonSpecies))
+                }catch {
+                    print("JSON Error \(error.localizedDescription)")
                     completed(.failure(.invalidData))
-                    return
                 }
-                
-                DispatchQueue.main.async {
-                    do{
-                        let pokemonSpecies = try self.pokemonDecoder.decode(PokemonSpecies.self, from: data!)
-                        pokemonSpeciesArray.append(pokemonSpecies)
-                        
-                    }catch {
-                        print("JSON Error \(error.localizedDescription)")
-                        print(error)
-                        completed(.failure(.invalidData))
-                    }
-                    completed(.success(pokemonSpeciesArray))
-                }
-                
-            }.resume()
-            
-        }
-               
+            }
+        }.resume()
+        
     } // end of getPokemonSpeciesDetails
     
     
-    func getPokemonEvolutionChain(pokemonEvolutionList: [PokemonSpecies], completed: @escaping(Result<[PokemonEvolutions], PokemonError>) -> Void){
+    func getPokemonEvolutionChain(pokemonEvolutionList: PokemonSpecies, completed: @escaping(Result<PokemonEvolutions, PokemonError>) -> Void){
         
-        var pokemonEvolutionArray = [PokemonEvolutions]()
+        let evolutionUrl = URL(string: pokemonEvolutionList.evolution_chain.url)
         
-        for pokemon in pokemonEvolutionList{
-            
-            let evolutionUrl = URL(string: pokemon.evolution_chain.url)
-            
-            session.dataTask(with: evolutionUrl!) { data, response, error in
-                if error != nil {
-                    print(error as Any)
-                    completed(.failure(.unableToComplete))
-                    return
-                }
-                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else{
-                    
-                    completed(.failure(.invalidData))
-                    return
-                }
+        session.dataTask(with: evolutionUrl!) { data, response, error in
+            if error != nil {
+                print(error as Any)
+                completed(.failure(.unableToComplete))
+                return
+            }
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else{
                 
-                DispatchQueue.main.async {
-                    do{
-                        
-//                        let rp = try JSONSerialization.jsonObject(with: data!, options: [])
-//                        print(rp)
-                        
-                        let pokemonEvolutionChain = try self.pokemonDecoder.decode(PokemonEvolutions.self, from: data!)
-                        pokemonEvolutionArray.append(pokemonEvolutionChain)
-                        
-                    }catch {
-                        print("JSON Error \(error.localizedDescription)")
-                        print(error)
-                        completed(.failure(.invalidData))
-                    }
-                    completed(.success(pokemonEvolutionArray))
+                completed(.failure(.invalidData))
+                return
+            }
+            
+            DispatchQueue.main.async {
+                do{
+                    let pokemonEvolutionChain = try self.pokemonDecoder.decode(PokemonEvolutions.self, from: data!)
+                    
+                    completed(.success(pokemonEvolutionChain))
+                }catch {
+                    print("JSON Error \(error.localizedDescription)")
+                    completed(.failure(.invalidData))
                 }
-               
-            }.resume()
-              
-           
-        } // end of getPokemonEvolutionChain
-       
+            }
+        }.resume()
         
-    }
         
-       
+    }// end of getPokemonEvolutionChain
+    
+    
     
     
     
