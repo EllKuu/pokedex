@@ -22,6 +22,7 @@ class PokemonList: Codable{
 /* Model for Pokemon Detail endpoint */
 class PokemonDetails: Codable{
     let id: Int
+    let order: Int
     let name: String
     let height: Int
     let weight: Int

@@ -101,12 +101,17 @@ class ViewController: UIViewController {
         }else{
             self.view.backgroundColor = .green
             //print(self.pokemonListResult)
-           // print(self.pokemonDetailsArray.count)
-            print(self.pokemonSpeciesDetailsArray.count)
-            
-            for p in pokemonSpeciesDetailsArray{
-                print(p.generation, p.name)
+           
+            print(self.pokemonDetailsArray.count)
+            self.pokemonDetailsArray.sort(by: {$0.id < $1.id})
+            for p in pokemonDetailsArray{
+                print(p.id, p.name, p.order)
             }
+            
+//            print(self.pokemonSpeciesDetailsArray.count)
+//            for p in pokemonSpeciesDetailsArray{
+//                print(p.id, p.name, p.order)
+//            }
             
             //print(self.pokemonEvolutionDetailsArray.count)
         }
