@@ -74,9 +74,12 @@ class ViewController: UIViewController {
             self.view.backgroundColor = .green
             print(self.pokemonListResult?.results.count)
             //print(self.pokemonDetailsArray)
-//            for p in self.pokemonDetailsArray {
-//                print(p.name, p.types)
-//            }
+            
+            self.pokemonDetailsArray.sort(by: {$0.id < $1.id})
+            
+            for p in self.pokemonDetailsArray {
+                print(p.id, p.name)
+            }
 
         }
        
