@@ -1,0 +1,130 @@
+//
+//  ViewController.swift
+//  pokedex
+//
+//  Created by elliott kung on 2021-07-18.
+//
+
+import UIKit
+import Foundation
+
+class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+    
+    var pokemonListResult: PokemonList?
+    private var pokemonDetailsArray = [PokemonDetails]()
+    var pokemonSpeciesDetailsArray = [PokemonSpecies]()
+    var pokemonEvolutionDetailsArray = [PokemonEvolutions]()
+    
+    
+    
+    private var isWaiting = false{
+        didSet{
+            self.updateUI()
+        }
+    }
+    
+    private lazy var pokemonCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        let cellWidthHeightConstant: CGFloat = 200
+
+                layout.sectionInset = UIEdgeInsets(top: 0,
+                                                   left: 5,
+                                                   bottom: 0,
+                                                   right: 5)
+                layout.scrollDirection = .vertical
+                layout.minimumInteritemSpacing = 0
+                layout.minimumLineSpacing = 0
+                layout.itemSize = CGSize(width: cellWidthHeightConstant, height: cellWidthHeightConstant)
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.register(PokemonCollectionViewCell.self, forCellWithReuseIdentifier: "PokemonCollectionViewCell")
+        collectionView.backgroundColor = .white
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.isWaiting = true
+        self.view.backgroundColor = .red
+        title = "PokeDex"
+        fetchData()
+    }// end of view did load
+    
+    func updateUI(){
+        if isWaiting{
+            print("API running")
+        }else{
+            self.view.addSubview(pokemonCollectionView)
+            
+            NSLayoutConstraint.activate([
+                pokemonCollectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+                pokemonCollectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+                pokemonCollectionView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+                pokemonCollectionView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor)
+            ])
+            
+            
+            //self.view.backgroundColor = .green
+            print(self.pokemonListResult?.results.count)
+            //print(self.pokemonDetailsArray)
+            
+            self.pokemonDetailsArray.sort(by: {$0.id < $1.id})
+            
+            for p in self.pokemonDetailsArray {
+                print(p.id, p.name)
+            }
+        }
+    }
+    
+    func fetchData(){
+        NetworkEngine.shared.getPokemonList { [weak self] result in
+            guard let strongSelf = self else { return }
+            
+            DispatchQueue.main.async {
+                switch result{
+                case .success(let pokemonDetails):
+                    strongSelf.pokemonListResult = pokemonDetails
+                    
+                    
+                    // Get pokemon Details from PokemonList
+                    NetworkEngine.shared.getPokemonDetails(pokemonList: pokemonDetails) { [weak self] result in
+                        guard let strongSelf = self else { return }
+
+                        DispatchQueue.main.async {
+                            switch result{
+                            case .success(let pokemonDetails):
+                                strongSelf.pokemonDetailsArray = pokemonDetails
+                                strongSelf.isWaiting = false
+
+                            case .failure(let error):
+                                print("Details - \(error.rawValue)")
+                            }
+                        }
+                    }// end of getPokemonDetails
+                
+                case .failure(let error):
+                    print("PokemonList - \(error.rawValue)")
+                }
+            }
+        }// end of getPokemonList
+    }
+    
+    
+    // MARK: UICollectionView Functions
+    
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return pokemonDetailsArray.count
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PokemonCollectionViewCell.identifier, for: indexPath) as! PokemonCollectionViewCell
+        cell.pokemonDetailsModel = pokemonDetailsArray[indexPath.row]
+        return cell
+    }
+    
+    
+} // end of class VC
+

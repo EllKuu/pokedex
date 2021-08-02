@@ -9,7 +9,7 @@ import Foundation
 
 
 /* Model for Pokemon list endpoint */
-class PokemonList: Codable{
+struct PokemonList: Codable{
         let results: [Results]
    
     struct Results: Codable{
@@ -20,7 +20,7 @@ class PokemonList: Codable{
 }
 
 /* Model for Pokemon Detail endpoint */
-class PokemonDetails: Codable{
+struct PokemonDetails: Codable{
     let id: Int
     let name: String
     let height: Int
@@ -50,7 +50,7 @@ struct `Type`: Codable{
 
 
 /* Pokemon Species details */
-class PokemonSpecies: Codable{
+struct PokemonSpecies: Codable{
     let id: Int
     let name: String
     let order: Int
@@ -82,7 +82,7 @@ struct EvolutionChain: Codable{
 
 
 /* Model for Pokemon evolution endpoint */
-class PokemonEvolutions: Codable{
+struct PokemonEvolutions: Codable{
     let chain: Chain
     
     struct Chain: Codable{
