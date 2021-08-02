@@ -14,6 +14,10 @@ class PokemonCollectionViewCell: UICollectionViewCell {
     // Initialization
     override init(frame: CGRect){
         super.init(frame: frame)
+        contentView.addSubview(roundedBackgroundView)
+        contentView.addSubview(pokemonImage)
+        contentView.addSubview(titleLabel)
+        contentView.clipsToBounds = true
     }
     
     required init?(coder: NSCoder) {
@@ -21,20 +25,26 @@ class PokemonCollectionViewCell: UICollectionViewCell {
     }
     
     override func layoutSubviews() {
-        setupUI()
+        super.layoutSubviews()
+        
+        roundedBackgroundView.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: frame.size.height)
+        titleLabel.frame = CGRect(x: 5, y: contentView.frame.size.height-50, width: frame.size.width-10, height: 50)
+        pokemonImage.frame = CGRect(x: 5, y: 0, width: frame.size.width-10, height: contentView.frame.size.height-50)
+        
     }
     
     // MARK: - Properties
     
-    var pokemonDetailsModel: PokemonDetails! {
+    var pokemonDetailsModel: PokemonViewModel! {
         didSet{
-            titleLabel.text = "\(pokemonDetailsModel.id).\(pokemonDetailsModel.name)"
-            pokemonImage.image = UIImage(systemName: "house")
+            titleLabel.text = pokemonDetailsModel.title
+            pokemonImage.image = pokemonDetailsModel.pokemonImage
         }
     }
     
     lazy var roundedBackgroundView: UIView = {
         let view = UIView()
+        
         view.layer.cornerRadius = 10
         view.layer.borderColor = UIColor.systemGray.cgColor
         view.layer.borderWidth = 1
@@ -44,12 +54,11 @@ class PokemonCollectionViewCell: UICollectionViewCell {
     
     lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont(name: "HelveticaNeue", size: 14)
+        label.font = UIFont(name: "HelveticaNeue", size: 10)
         label.textColor = .systemBlue
+        label.textAlignment = .center
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
-        label.frame.size.width = 300
-        label.sizeToFit()
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -57,34 +66,11 @@ class PokemonCollectionViewCell: UICollectionViewCell {
     lazy var pokemonImage: UIImageView = {
         let image = UIImageView()
         image.image = UIImage(systemName: "house")
-        image.frame = CGRect(x: 0, y: 0, width: 25, height: 25)
+        image.contentMode = .scaleAspectFit
+        image.clipsToBounds = true
         image.translatesAutoresizingMaskIntoConstraints = false
         
         return image
     }()
     
-}
-
-// MARK: - UI Setup
-extension PokemonCollectionViewCell {
-    private func setupUI() {
-        self.contentView.addSubview(roundedBackgroundView)
-        roundedBackgroundView.addSubview(pokemonImage)
-        roundedBackgroundView.addSubview(titleLabel)
-        
-        NSLayoutConstraint.activate([
-            roundedBackgroundView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5),
-            roundedBackgroundView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -5),
-            roundedBackgroundView.leftAnchor.constraint(equalTo: self.contentView.leftAnchor, constant: 5),
-            roundedBackgroundView.rightAnchor.constraint(equalTo: self.contentView.rightAnchor, constant: -5),
-            
-            pokemonImage.centerXAnchor.constraint(equalTo: roundedBackgroundView.centerXAnchor),
-            //            pokemonImage.centerYAnchor.constraint(equalTo: roundedBackgroundView.centerYAnchor),
-            pokemonImage.bottomAnchor.constraint(equalTo: self.titleLabel.topAnchor, constant: 100),
-            
-            titleLabel.centerXAnchor.constraint(equalTo: roundedBackgroundView.centerXAnchor),
-            titleLabel.centerYAnchor.constraint(equalTo: roundedBackgroundView.centerYAnchor)
-        ])
-        
-    }
 }

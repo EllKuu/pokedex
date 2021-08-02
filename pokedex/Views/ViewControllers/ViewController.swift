@@ -25,16 +25,16 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     private lazy var pokemonCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        let cellWidthHeightConstant: CGFloat = 200
+        let cellWidthHeightConstant: CGFloat = view.frame.size.width / 3
 
                 layout.sectionInset = UIEdgeInsets(top: 0,
                                                    left: 5,
                                                    bottom: 0,
                                                    right: 5)
                 layout.scrollDirection = .vertical
-                layout.minimumInteritemSpacing = 0
-                layout.minimumLineSpacing = 0
-                layout.itemSize = CGSize(width: cellWidthHeightConstant, height: cellWidthHeightConstant)
+                layout.minimumInteritemSpacing = 1
+                layout.minimumLineSpacing = 1
+                layout.itemSize = CGSize(width: cellWidthHeightConstant-4, height: cellWidthHeightConstant-4)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(PokemonCollectionViewCell.self, forCellWithReuseIdentifier: "PokemonCollectionViewCell")
@@ -97,6 +97,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
                             switch result{
                             case .success(let pokemonDetails):
                                 strongSelf.pokemonDetailsArray = pokemonDetails
+                                
                                 strongSelf.isWaiting = false
 
                             case .failure(let error):
@@ -121,7 +122,8 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PokemonCollectionViewCell.identifier, for: indexPath) as! PokemonCollectionViewCell
-        cell.pokemonDetailsModel = pokemonDetailsArray[indexPath.row]
+        //cell.pokemonDetailsModel = pokemonDetailsArray[indexPath.row]
+        cell.pokemonDetailsModel = PokemonViewModel(pokemonDetailsArray[indexPath.row])
         return cell
     }
     
