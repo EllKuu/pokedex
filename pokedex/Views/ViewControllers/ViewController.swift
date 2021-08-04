@@ -67,15 +67,15 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             ])
             
             
-            //self.view.backgroundColor = .green
+            self.view.backgroundColor = .white
             print(self.pokemonListResult?.results.count)
             //print(self.pokemonDetailsArray)
             
             self.pokemonDetailsArray.sort(by: {$0.id < $1.id})
             
-            for p in self.pokemonDetailsArray {
-                print(p.id, p.name)
-            }
+//            for p in self.pokemonDetailsArray {
+//                print(p.id, p.name)
+//            }
         }
     }
     
@@ -125,6 +125,10 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         //cell.pokemonDetailsModel = pokemonDetailsArray[indexPath.row]
         cell.pokemonDetailsModel = PokemonViewModel(pokemonDetailsArray[indexPath.row])
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("cell tapped")
     }
     
     
