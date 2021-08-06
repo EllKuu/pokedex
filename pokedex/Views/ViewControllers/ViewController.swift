@@ -12,8 +12,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     var pokemonListResult: PokemonList?
     private var pokemonDetailsArray = [PokemonDetails]()
-    var pokemonSpeciesDetailsArray = [PokemonSpecies]()
-    var pokemonEvolutionDetailsArray = [PokemonEvolutions]()
+  
     
     
     
@@ -50,6 +49,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         self.isWaiting = true
         self.view.backgroundColor = .red
         title = "PokeDex"
+        navigationController?.navigationBar.prefersLargeTitles = true
         fetchData()
     }// end of view did load
     
@@ -128,7 +128,12 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("cell tapped")
+        let vc = PokemonDetailsViewController()
+        // call pokemonVC fetch function and send url for species from indexpath
+        vc.modalPresentationStyle = .formSheet
+        vc.title = "\(pokemonDetailsArray[indexPath.row].name.capitalized)"
+        vc.pokemonDetail = pokemonDetailsArray[indexPath.row]
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     

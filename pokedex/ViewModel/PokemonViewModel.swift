@@ -27,7 +27,6 @@ struct PokemonViewModel{
         
         
         for type in pokemonDetailModel.types{
-            //print(type.type.name)
             let pokemonType = type.type.name
             
             switch pokemonType {
@@ -71,7 +70,7 @@ struct PokemonViewModel{
                 pokemonTypeColors.append(UIColor(hex: "#000000ff")!)
             }
         }
-        //print(pokemonTypeColors)
+        
         
     }
     
