@@ -24,16 +24,16 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     private lazy var pokemonCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        let cellWidthHeightConstant: CGFloat = view.frame.size.width / 3
+        let cellWidthHeightConstant: CGFloat = view.frame.size.width / 2.5
 
                 layout.sectionInset = UIEdgeInsets(top: 0,
                                                    left: 5,
                                                    bottom: 0,
                                                    right: 5)
                 layout.scrollDirection = .vertical
-                layout.minimumInteritemSpacing = 1
-                layout.minimumLineSpacing = 1
-                layout.itemSize = CGSize(width: cellWidthHeightConstant-4, height: cellWidthHeightConstant-4)
+                layout.minimumInteritemSpacing = 2
+                layout.minimumLineSpacing = 6
+                layout.itemSize = CGSize(width: cellWidthHeightConstant + 30, height: cellWidthHeightConstant)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(PokemonCollectionViewCell.self, forCellWithReuseIdentifier: "PokemonCollectionViewCell")
@@ -41,6 +41,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+       
         return collectionView
     }()
     
@@ -50,6 +51,8 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         self.view.backgroundColor = .red
         title = "PokeDex"
         navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationItem.largeTitleDisplayMode = .always
         fetchData()
     }// end of view did load
     

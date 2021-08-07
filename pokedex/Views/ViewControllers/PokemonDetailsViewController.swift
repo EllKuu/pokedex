@@ -16,8 +16,17 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         table.backgroundColor = .green
         table.dataSource = self
         table.delegate = self
+        table.layer.cornerRadius = 25
         table.translatesAutoresizingMaskIntoConstraints = false
         return table
+    }()
+    
+    private lazy var pokemonView: UIView = {
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 500))
+        view.backgroundColor = .yellow
+        view.layer.cornerRadius = 25
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     // MARK: Properties
@@ -37,6 +46,9 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         guard let pokemonDetail = pokemonDetail else { return }
         fetchData(speciesUrl: pokemonDetail)
         view.backgroundColor = .red
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationItem.largeTitleDisplayMode = .always
         
     }
     
@@ -46,7 +58,8 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         if isWaiting{
             print("API running")
         }else{
-            view.backgroundColor = .white
+            view.backgroundColor = .blue
+            view.addSubview(pokemonView)
             view.addSubview(pokemonTableView)
             
             guard let details = pokemonSpeciesDetails, let evolution = pokemonEvolutionDetails else { return }
@@ -54,7 +67,13 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             print(evolution)
             
             NSLayoutConstraint.activate([
-                pokemonTableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+                
+                pokemonView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+                pokemonView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+                pokemonView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+                pokemonView.bottomAnchor.constraint(equalTo: pokemonTableView.topAnchor, constant: -5),
+                
+                pokemonTableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 300),
                 pokemonTableView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
                 pokemonTableView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
                 pokemonTableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor)
@@ -102,23 +121,39 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return 5
+        return 1
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 5
     }
     
+//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//
+//        switch section {
+//        case 0:
+//            let view = UIView()
+//            view.backgroundColor = .red
+//            view.frame = CGRect(x: 0, y: 0, width: self.pokemonTableView.frame.width, height: 100)
+//            return view
+//        default:
+//            return nil
+//        }
+//
+//    }
+    
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
+        case 0:
+            return "Facts"
         case 1:
-            return "start"
+            return "Evolutions"
         case 2:
-            return "next"
+            return "Stats"
         case 3:
-            return "next one"
+            return "Moves"
         case 4:
-            return "next to one"
+            return "Details"
         default:
             return "last"
         }
