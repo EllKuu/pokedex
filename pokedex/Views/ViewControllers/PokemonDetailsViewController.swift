@@ -12,8 +12,8 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     // MARK: UI Components
     
     private lazy var pokemonTableView: UITableView = {
-        let table = UITableView(frame: .zero, style: .insetGrouped)
-        table.backgroundColor = .green
+        let table = UITableView(frame: .zero, style: .plain)
+        table.backgroundColor = .white
         table.dataSource = self
         table.delegate = self
         table.layer.cornerRadius = 25
@@ -30,12 +30,12 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     }()
     
     private lazy var pokemonImageView: UIImageView = {
-        let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 2000, height: 2000))
-        
+        let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        imageView.contentMode = .scaleAspectFill
+        //imageView.backgroundColor = .cyan
         let url = URL(string: pokemonImage ?? "")
         let data = try? Data(contentsOf: url!)
         imageView.image = UIImage(data: data!) ?? UIImage(systemName: "questionmark.circle")!
-        
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -45,6 +45,8 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     var pokemonSpeciesDetails: PokemonSpecies?
     var pokemonEvolutionDetails: PokemonEvolutions?
     var pokemonImage: String?
+    var pokemonTypeColors: [UIColor] = []
+    
     
     private var isWaiting = false{
         didSet{
@@ -76,6 +78,22 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             pokemonView.addSubview(pokemonImageView)
             pokemonView.bringSubviewToFront(pokemonImageView)
             
+            guard let pokemonDetail = pokemonDetail else { return }
+            for type in pokemonDetail.types{
+                let pokemonType = type.type.name
+                let color = PokemonColors.shared.pokemonGradientColors(pokemonType: pokemonType)
+                pokemonTypeColors.append(color)
+            }
+            
+            let gradient = CAGradientLayer()
+            var cgColors: [CGColor] = pokemonTypeColors.map({ $0.cgColor })
+            if cgColors.count == 1 {
+                cgColors.insert(UIColor.white.cgColor, at: 0)
+            }
+            gradient.colors =  cgColors
+            gradient.frame = pokemonView.frame
+            pokemonView.layer.insertSublayer(gradient, at: 0)
+            
             view.addSubview(pokemonTableView)
             
             guard let details = pokemonSpeciesDetails, let evolution = pokemonEvolutionDetails else { return }
@@ -95,7 +113,9 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
                 pokemonTableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
                 
                 pokemonImageView.centerXAnchor.constraint(equalTo: pokemonView.centerXAnchor),
-                pokemonImageView.centerYAnchor.constraint(equalTo: pokemonView.centerYAnchor)
+                pokemonImageView.centerYAnchor.constraint(equalTo: pokemonView.centerYAnchor, constant: 50),
+                pokemonImageView.widthAnchor.constraint(equalTo: pokemonView.widthAnchor, constant: -200),
+                pokemonImageView.heightAnchor.constraint(equalTo: pokemonView.heightAnchor, constant: -200),
             ])
         }
     }
@@ -164,7 +184,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
         case 0:
-            return "Facts"
+            return "About"
         case 1:
             return "Evolutions"
         case 2:
