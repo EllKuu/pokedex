@@ -136,6 +136,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         vc.modalPresentationStyle = .formSheet
         vc.title = "\(pokemonDetailsArray[indexPath.row].name.capitalized)"
         vc.pokemonDetail = pokemonDetailsArray[indexPath.row]
+        vc.pokemonImage = pokemonDetailsArray[indexPath.row].sprites.front_default
         self.navigationController?.pushViewController(vc, animated: true)
     }
     

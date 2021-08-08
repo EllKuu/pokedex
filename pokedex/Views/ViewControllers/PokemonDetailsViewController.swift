@@ -24,15 +24,27 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     private lazy var pokemonView: UIView = {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 500))
         view.backgroundColor = .yellow
-        view.layer.cornerRadius = 25
+        //view.layer.cornerRadius = 25
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
+    }()
+    
+    private lazy var pokemonImageView: UIImageView = {
+        let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 2000, height: 2000))
+        
+        let url = URL(string: pokemonImage ?? "")
+        let data = try? Data(contentsOf: url!)
+        imageView.image = UIImage(data: data!) ?? UIImage(systemName: "questionmark.circle")!
+        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
     }()
     
     // MARK: Properties
     var pokemonDetail: PokemonDetails?
     var pokemonSpeciesDetails: PokemonSpecies?
     var pokemonEvolutionDetails: PokemonEvolutions?
+    var pokemonImage: String?
     
     private var isWaiting = false{
         didSet{
@@ -59,7 +71,11 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             print("API running")
         }else{
             view.backgroundColor = .blue
+           
             view.addSubview(pokemonView)
+            pokemonView.addSubview(pokemonImageView)
+            pokemonView.bringSubviewToFront(pokemonImageView)
+            
             view.addSubview(pokemonTableView)
             
             guard let details = pokemonSpeciesDetails, let evolution = pokemonEvolutionDetails else { return }
@@ -68,15 +84,18 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             
             NSLayoutConstraint.activate([
                 
-                pokemonView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+                pokemonView.topAnchor.constraint(equalTo: self.view.topAnchor),
                 pokemonView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
                 pokemonView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-                pokemonView.bottomAnchor.constraint(equalTo: pokemonTableView.topAnchor, constant: -5),
+                pokemonView.bottomAnchor.constraint(equalTo: pokemonTableView.topAnchor, constant: 50),
                 
-                pokemonTableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 300),
+                pokemonTableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 250),
                 pokemonTableView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
                 pokemonTableView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-                pokemonTableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor)
+                pokemonTableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+                
+                pokemonImageView.centerXAnchor.constraint(equalTo: pokemonView.centerXAnchor),
+                pokemonImageView.centerYAnchor.constraint(equalTo: pokemonView.centerYAnchor)
             ])
         }
     }
@@ -121,7 +140,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return 1
+        return 2
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -161,8 +180,18 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
-        cell.textLabel?.text = "hi"
-        return cell
+        
+        cell.textLabel?.numberOfLines = 0
+        cell.textLabel?.lineBreakMode = .byWordWrapping
+        
+        if indexPath.row == 0{
+            cell.textLabel?.text = pokemonSpeciesDetails?.flavor_text_entries[0].flavor_text
+            return cell
+        }else{
+            cell.textLabel?.text = "hi"
+            return cell
+        }
+
     }
 
 }
