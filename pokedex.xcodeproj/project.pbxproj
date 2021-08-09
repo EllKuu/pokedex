@@ -24,6 +24,8 @@
 		B29D720226B98BA600469FB6 /* ExtensionHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29D720126B98BA600469FB6 /* ExtensionHelpers.swift */; };
 		B29D720426BC60CD00469FB6 /* PokemonDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29D720326BC60CD00469FB6 /* PokemonDetailsViewController.swift */; };
 		B29D720626C0559A00469FB6 /* PokemonColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29D720526C0559A00469FB6 /* PokemonColors.swift */; };
+		B29D720826C160DD00469FB6 /* PokemonFlavorTextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29D720726C160DD00469FB6 /* PokemonFlavorTextTableViewCell.swift */; };
+		B29D720A26C167FD00469FB6 /* PokemonFlavorTextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29D720926C167FD00469FB6 /* PokemonFlavorTextViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +69,8 @@
 		B29D720126B98BA600469FB6 /* ExtensionHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionHelpers.swift; sourceTree = "<group>"; };
 		B29D720326BC60CD00469FB6 /* PokemonDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonDetailsViewController.swift; sourceTree = "<group>"; };
 		B29D720526C0559A00469FB6 /* PokemonColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonColors.swift; sourceTree = "<group>"; };
+		B29D720726C160DD00469FB6 /* PokemonFlavorTextTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonFlavorTextTableViewCell.swift; sourceTree = "<group>"; };
+		B29D720926C167FD00469FB6 /* PokemonFlavorTextViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonFlavorTextViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -199,6 +203,7 @@
 			isa = PBXGroup;
 			children = (
 				B29D71FF26B875EB00469FB6 /* PokemonViewModel.swift */,
+				B29D720926C167FD00469FB6 /* PokemonFlavorTextViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -207,6 +212,7 @@
 			isa = PBXGroup;
 			children = (
 				B253C70B26B71D8F00AE1167 /* PokemonCollectionViewCell.swift */,
+				B29D720726C160DD00469FB6 /* PokemonFlavorTextTableViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -345,11 +351,13 @@
 				B220EEE026A4C24400971BAC /* PokemonModels.swift in Sources */,
 				B29D720426BC60CD00469FB6 /* PokemonDetailsViewController.swift in Sources */,
 				B253C70C26B71D8F00AE1167 /* PokemonCollectionViewCell.swift in Sources */,
+				B29D720A26C167FD00469FB6 /* PokemonFlavorTextViewModel.swift in Sources */,
 				B29D720226B98BA600469FB6 /* ExtensionHelpers.swift in Sources */,
 				B29D720626C0559A00469FB6 /* PokemonColors.swift in Sources */,
 				B220EEB326A4A25300971BAC /* pokedex.xcdatamodeld in Sources */,
 				B220EEE226A4C46300971BAC /* NetworkEngine.swift in Sources */,
 				B29D720026B875EB00469FB6 /* PokemonViewModel.swift in Sources */,
+				B29D720826C160DD00469FB6 /* PokemonFlavorTextTableViewCell.swift in Sources */,
 				B220EEAD26A4A25300971BAC /* ViewController.swift in Sources */,
 				B220EEA926A4A25300971BAC /* AppDelegate.swift in Sources */,
 				B220EEAB26A4A25300971BAC /* SceneDelegate.swift in Sources */,

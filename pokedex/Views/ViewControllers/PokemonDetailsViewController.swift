@@ -64,6 +64,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         navigationController?.navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationItem.largeTitleDisplayMode = .always
         
+        
     }
     
     // MARK: Fetch Data and UIUpdate
@@ -96,9 +97,11 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             
             view.addSubview(pokemonTableView)
             
+            pokemonTableView.register(PokemonFlavorTextTableViewCell.self, forCellReuseIdentifier: PokemonFlavorTextTableViewCell.identifier)
+            
             guard let details = pokemonSpeciesDetails, let evolution = pokemonEvolutionDetails else { return }
-            print(details)
-            print(evolution)
+            //print(details.flavor_text_entries)
+            //print(evolution)
             
             NSLayoutConstraint.activate([
                 
@@ -204,14 +207,25 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         cell.textLabel?.numberOfLines = 0
         cell.textLabel?.lineBreakMode = .byWordWrapping
         
-        if indexPath.row == 0{
-            cell.textLabel?.text = pokemonSpeciesDetails?.flavor_text_entries[0].flavor_text
+        if indexPath.row == 0 && indexPath.section == 0{
+            let cell = tableView.dequeueReusableCell(withIdentifier: PokemonFlavorTextTableViewCell.identifier, for: indexPath) as! PokemonFlavorTextTableViewCell
+            cell.pokemonFlavorTextViewModel = PokemonFlavorTextViewModel(pokemonSpeciesDetails!)
+            
+            
             return cell
         }else{
             cell.textLabel?.text = "hi"
             return cell
         }
 
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == 0 && indexPath.row == 0{
+            tableView.deselectRow(at: indexPath, animated: true)
+            let cell = tableView.cellForRow(at: indexPath) as? PokemonFlavorTextTableViewCell
+            cell?.pokemonFlavorTextViewModel.changeFlavorText()
+        }
     }
 
 }
