@@ -23,7 +23,8 @@ struct PokemonFlavorTextViewModel{
             }
            
         }
-        //print(englishText)
+        
+        englishText = Array(Set(englishText))
         flavorText = englishText[idx]
         
     }

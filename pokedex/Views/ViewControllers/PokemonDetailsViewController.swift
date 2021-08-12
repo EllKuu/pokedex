@@ -12,8 +12,8 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     // MARK: UI Components
     
     private lazy var pokemonTableView: UITableView = {
-        let table = UITableView(frame: .zero, style: .plain)
-        table.backgroundColor = .white
+        let table = UITableView(frame: .zero, style: .insetGrouped)
+        table.backgroundColor = .gray
         table.dataSource = self
         table.delegate = self
         table.layer.cornerRadius = 25
@@ -98,10 +98,11 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             view.addSubview(pokemonTableView)
             
             pokemonTableView.register(PokemonFlavorTextTableViewCell.self, forCellReuseIdentifier: PokemonFlavorTextTableViewCell.identifier)
+            pokemonTableView.register(PokemonEvolutionsTableViewCell.self, forCellReuseIdentifier: PokemonEvolutionsTableViewCell.identifier)
             
             guard let details = pokemonSpeciesDetails, let evolution = pokemonEvolutionDetails else { return }
             //print(details.flavor_text_entries)
-            //print(evolution)
+            //print(evolution.chain)
             
             NSLayoutConstraint.activate([
                 
@@ -162,27 +163,22 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     // MARK: TableView Functions
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        return 2
+        if section == 0{
+            return 1
+        }
+        return 3
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 5
+        return 2
     }
     
-//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-//
-//        switch section {
-//        case 0:
-//            let view = UIView()
-//            view.backgroundColor = .red
-//            view.frame = CGRect(x: 0, y: 0, width: self.pokemonTableView.frame.width, height: 100)
-//            return view
-//        default:
-//            return nil
-//        }
-//
-//    }
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        view.tintColor = UIColor.red
+           let header = view as! UITableViewHeaderFooterView
+           header.textLabel?.textColor = UIColor.white
+        header.textLabel?.textAlignment = .center
+    }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
@@ -208,15 +204,29 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         cell.textLabel?.lineBreakMode = .byWordWrapping
         
         if indexPath.row == 0 && indexPath.section == 0{
-            let cell = tableView.dequeueReusableCell(withIdentifier: PokemonFlavorTextTableViewCell.identifier, for: indexPath) as! PokemonFlavorTextTableViewCell
-            cell.pokemonFlavorTextViewModel = PokemonFlavorTextViewModel(pokemonSpeciesDetails!)
+            let cellFlavor = tableView.dequeueReusableCell(withIdentifier: PokemonFlavorTextTableViewCell.identifier, for: indexPath) as! PokemonFlavorTextTableViewCell
+            cellFlavor.pokemonFlavorTextViewModel = PokemonFlavorTextViewModel(pokemonSpeciesDetails!)
+            return cellFlavor
+        }
+        else if  indexPath.section == 1{
+            let cellEvolution = tableView.dequeueReusableCell(withIdentifier: PokemonEvolutionsTableViewCell.identifier, for: indexPath) as! PokemonEvolutionsTableViewCell
+            cellEvolution.pokemonEvolutionsModel = PokemonEvolutionsViewModel(pokemonEvolutionDetails!)
             
+            for i in cellEvolution.evolutionsArray!{
+                print("Name: \(i)")
+            }
             
-            return cell
-        }else{
+            cellEvolution.textLabel?.text = cellEvolution.evolutionsArray![indexPath.row]
+            
+            return cellEvolution
+        }
+        
+        else{
             cell.textLabel?.text = "hi"
             return cell
         }
+        
+       
 
     }
     
