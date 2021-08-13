@@ -46,6 +46,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     var pokemonEvolutionDetails: PokemonEvolutions?
     var pokemonImage: String?
     var pokemonTypeColors: [UIColor] = []
+    var pokemonEvolutionNames: [String] = []
     
     
     private var isWaiting = false{
@@ -75,6 +76,8 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         }else{
             view.backgroundColor = .blue
            
+            getEvolutionNames(evolutionChain: pokemonEvolutionDetails!.chain)
+            
             view.addSubview(pokemonView)
             pokemonView.addSubview(pokemonImageView)
             pokemonView.bringSubviewToFront(pokemonImageView)
@@ -96,6 +99,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             pokemonView.layer.insertSublayer(gradient, at: 0)
             
             view.addSubview(pokemonTableView)
+
             
             pokemonTableView.register(PokemonFlavorTextTableViewCell.self, forCellReuseIdentifier: PokemonFlavorTextTableViewCell.identifier)
             pokemonTableView.register(PokemonEvolutionsTableViewCell.self, forCellReuseIdentifier: PokemonEvolutionsTableViewCell.identifier)
@@ -157,6 +161,25 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         
     } // end of fetch data
     
+    // MARK: Evolution Chain Getting Names
+    func getEvolutionNames(evolutionChain: PokemonEvolutions.Chain){
+        //extract chains species name
+        pokemonEvolutionNames.append(evolutionChain.species.name)
+        
+        //check if chain has any chainlinks in evolve to
+        if !evolutionChain.evolves_to.isEmpty{
+            traverseChain(chainLink: evolutionChain.evolves_to)
+        }
+    }
+    
+    func traverseChain(chainLink: [PokemonEvolutions.ChainLink]){
+        for item in chainLink{
+            pokemonEvolutionNames.append(item.species.name)
+            if !item.evolves_to.isEmpty{
+                traverseChain(chainLink: item.evolves_to)
+            }
+        }
+    }
     
 
     
@@ -164,7 +187,10 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0{
-            return 1
+            return 2
+        }
+        else if section == 1{
+            return pokemonEvolutionNames.count
         }
         return 3
     }
@@ -202,23 +228,24 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         
         cell.textLabel?.numberOfLines = 0
         cell.textLabel?.lineBreakMode = .byWordWrapping
+        cell.textLabel?.textAlignment = .center
         
         if indexPath.row == 0 && indexPath.section == 0{
             let cellFlavor = tableView.dequeueReusableCell(withIdentifier: PokemonFlavorTextTableViewCell.identifier, for: indexPath) as! PokemonFlavorTextTableViewCell
             cellFlavor.pokemonFlavorTextViewModel = PokemonFlavorTextViewModel(pokemonSpeciesDetails!)
             return cellFlavor
         }
+        else if indexPath.row == 1 && indexPath.section == 0{
+            cell.textLabel?.text = "New Fact"
+            
+            return cell
+        }
         else if  indexPath.section == 1{
             let cellEvolution = tableView.dequeueReusableCell(withIdentifier: PokemonEvolutionsTableViewCell.identifier, for: indexPath) as! PokemonEvolutionsTableViewCell
-            cellEvolution.pokemonEvolutionsModel = PokemonEvolutionsViewModel(pokemonEvolutionDetails!)
-            
-            for i in cellEvolution.evolutionsArray!{
-                print("Name: \(i)")
-            }
-            
-            cellEvolution.textLabel?.text = cellEvolution.evolutionsArray![indexPath.row]
-            
+            cellEvolution.pokemonEvolutionsModel = PokemonEvolutionsViewModel(pokemonEvolutionNames[indexPath.row])
+           
             return cellEvolution
+            
         }
         
         else{
@@ -231,9 +258,11 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 0 && indexPath.row == 0{
-            tableView.deselectRow(at: indexPath, animated: true)
-            let cell = tableView.cellForRow(at: indexPath) as? PokemonFlavorTextTableViewCell
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        if indexPath.section == 0 && indexPath.row == 1{
+            let idx = IndexPath(row: 0, section: 0)
+            let cell = tableView.cellForRow(at: idx) as? PokemonFlavorTextTableViewCell
             cell?.pokemonFlavorTextViewModel.changeFlavorText()
         }
     }

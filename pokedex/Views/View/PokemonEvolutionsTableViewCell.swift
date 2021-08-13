@@ -10,18 +10,20 @@ import UIKit
 class PokemonEvolutionsTableViewCell: UITableViewCell {
 
    static let identifier = "PokemonEvolutionsTableViewCell"
-    var evolutionsArray: [String]?
+   
     
     var pokemonEvolutionsModel: PokemonEvolutionsViewModel! {
         didSet{
 
-            evolutionsArray = pokemonEvolutionsModel.pokemonEvolutionChain
+            textLabel?.text = pokemonEvolutionsModel.name.capitalized
+            textLabel?.textAlignment = .center
                 
         }
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
     }
     
     required init?(coder: NSCoder) {
