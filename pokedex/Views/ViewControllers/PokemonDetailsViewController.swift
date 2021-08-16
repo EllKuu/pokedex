@@ -42,11 +42,13 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     
     // MARK: Properties
     var pokemonDetail: PokemonDetails?
+    var pokemonList: [PokemonDetails] = []
     var pokemonSpeciesDetails: PokemonSpecies?
     var pokemonEvolutionDetails: PokemonEvolutions?
     var pokemonImage: String?
     var pokemonTypeColors: [UIColor] = []
     var pokemonEvolutionNames: [String] = []
+    var pokemonEvolutionImage: [UIImage] = []
     
     
     private var isWaiting = false{
@@ -77,6 +79,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             view.backgroundColor = .blue
            
             getEvolutionNames(evolutionChain: pokemonEvolutionDetails!.chain)
+            getSpriteImage(pokemonNames: pokemonEvolutionNames)
             
             view.addSubview(pokemonView)
             pokemonView.addSubview(pokemonImageView)
@@ -162,6 +165,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     } // end of fetch data
     
     // MARK: Evolution Chain Getting Names
+    
     func getEvolutionNames(evolutionChain: PokemonEvolutions.Chain){
         //extract chains species name
         pokemonEvolutionNames.append(evolutionChain.species.name)
@@ -177,6 +181,16 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             pokemonEvolutionNames.append(item.species.name)
             if !item.evolves_to.isEmpty{
                 traverseChain(chainLink: item.evolves_to)
+            }
+        }
+    }
+    
+    func getSpriteImage(pokemonNames: [String]){
+        for name in pokemonNames {
+            if let pokemon =  pokemonList.first(where: {$0.name == name}){
+                let url = URL(string: pokemon.sprites.front_default ?? "")
+                let data = try? Data(contentsOf: url!)
+                pokemonEvolutionImage.append((UIImage(data: data!) ?? UIImage(systemName: "questionmark.circle"))!)
             }
         }
     }
@@ -233,16 +247,18 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         if indexPath.row == 0 && indexPath.section == 0{
             let cellFlavor = tableView.dequeueReusableCell(withIdentifier: PokemonFlavorTextTableViewCell.identifier, for: indexPath) as! PokemonFlavorTextTableViewCell
             cellFlavor.pokemonFlavorTextViewModel = PokemonFlavorTextViewModel(pokemonSpeciesDetails!)
+           
             return cellFlavor
         }
         else if indexPath.row == 1 && indexPath.section == 0{
             cell.textLabel?.text = "New Fact"
+            cell.textLabel?.textColor = .blue
             
             return cell
         }
         else if  indexPath.section == 1{
             let cellEvolution = tableView.dequeueReusableCell(withIdentifier: PokemonEvolutionsTableViewCell.identifier, for: indexPath) as! PokemonEvolutionsTableViewCell
-            cellEvolution.pokemonEvolutionsModel = PokemonEvolutionsViewModel(pokemonEvolutionNames[indexPath.row])
+            cellEvolution.pokemonEvolutionsModel = PokemonEvolutionsViewModel(pokemonEvolutionNames[indexPath.row], pokemonEvolutionImage[indexPath.row])
            
             return cellEvolution
             
@@ -258,13 +274,29 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: false)
         
         if indexPath.section == 0 && indexPath.row == 1{
             let idx = IndexPath(row: 0, section: 0)
             let cell = tableView.cellForRow(at: idx) as? PokemonFlavorTextTableViewCell
             cell?.pokemonFlavorTextViewModel.changeFlavorText()
         }
+    }
+    
+    func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        
+        if indexPath.section == 0 && indexPath.row == 0{
+            tableView.cellForRow(at: indexPath)?.selectionStyle = .none
+            return false
+        }
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.section == 0 && indexPath.row == 1{
+            return 50
+        }
+        return 100
     }
 
 }

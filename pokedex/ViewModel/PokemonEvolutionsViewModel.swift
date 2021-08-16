@@ -6,15 +6,18 @@
 //
 
 import Foundation
+import UIKit
 
 struct PokemonEvolutionsViewModel{
     
     
     let name: String
+    let pokemonImage: UIImage
     
-    init(_ pokemonEvolutions: String) {
+    init(_ pokemonEvolutions: String, _ pokemonSprites: UIImage) {
         
         name = pokemonEvolutions
+        pokemonImage = pokemonSprites
         
         
     }
