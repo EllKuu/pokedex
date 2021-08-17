@@ -15,7 +15,7 @@ class PokemonEvolutionsTableViewCell: UITableViewCell {
     var pokemonEvolutionsModel: PokemonEvolutionsViewModel! {
         didSet{
             
-            pokemonName.text = pokemonEvolutionsModel.name.capitalized
+            pokemonName.text = "\(pokemonEvolutionsModel.evolutionLevel).  \(pokemonEvolutionsModel.name.capitalized)"
             pokemonImage.image = pokemonEvolutionsModel.pokemonImage
                 
         }
@@ -49,9 +49,18 @@ class PokemonEvolutionsTableViewCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        pokemonName.frame = CGRect(x: 0, y: 0, width: frame.size
+        pokemonName.frame = CGRect(x: 0, y: 0, width: contentView.frame.size
                                     .width, height: contentView.frame.size.height)
-        pokemonImage.frame = CGRect(x: 0, y: 0, width: contentView.frame.size.height, height: contentView.frame.size.height)
+        pokemonImage.frame = CGRect(x: 0, y: 0, width: contentView.frame.size.height-10, height: contentView.frame.size.height-10)
+        
+        NSLayoutConstraint.activate([
+            pokemonImage.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+            
+            pokemonName.leftAnchor.constraint(equalTo: pokemonImage.rightAnchor, constant: 25),
+            pokemonName.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            
+        ])
+        
         
     }
     

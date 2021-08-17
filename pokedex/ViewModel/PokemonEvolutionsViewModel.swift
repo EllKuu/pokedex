@@ -13,11 +13,13 @@ struct PokemonEvolutionsViewModel{
     
     let name: String
     let pokemonImage: UIImage
+    let evolutionLevel: Int
     
-    init(_ pokemonEvolutions: String, _ pokemonSprites: UIImage) {
+    init(_ pokemonSprites: UIImage, _ pokemonHierarchy: PokemonEvolutionHierarchy ) {
         
-        name = pokemonEvolutions
+        name = pokemonHierarchy.pokemonName
         pokemonImage = pokemonSprites
+        evolutionLevel = pokemonHierarchy.evolutionLevel
         
         
     }
