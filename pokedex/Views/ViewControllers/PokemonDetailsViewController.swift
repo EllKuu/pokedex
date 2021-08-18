@@ -12,23 +12,28 @@ struct PokemonEvolutionHierarchy{
         var evolutionLevel: Int
     }
 
-class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+
+
+class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate  {
     
     // MARK: UI Components
     
     private lazy var pokemonTableView: UITableView = {
-        let table = UITableView(frame: .zero, style: .insetGrouped)
-        table.backgroundColor = .gray
+        let table = UITableView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height), style: .insetGrouped)
+        table.backgroundColor = .clear
         table.dataSource = self
         table.delegate = self
         table.layer.cornerRadius = 25
+        table.layer.borderWidth = 5
+        table.layer.borderColor = UIColor.white.cgColor
         table.translatesAutoresizingMaskIntoConstraints = false
+        
         return table
     }()
     
     private lazy var pokemonView: UIView = {
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 500))
-        view.backgroundColor = .yellow
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height))
+        view.backgroundColor = .clear
         //view.layer.cornerRadius = 25
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -57,14 +62,13 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     var evolutionLevel = 1
     var pokemonEvolutions: [PokemonEvolutionHierarchy] = []
     
-
-    
-    
     private var isWaiting = false{
         didSet{
             self.updateUI()
         }
     }
+    
+    var pokemonFact: String?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -85,14 +89,13 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         if isWaiting{
             print("API running")
         }else{
-            view.backgroundColor = .blue
+            view.backgroundColor = .clear
            
             getEvolutionNames(evolutionChain: pokemonEvolutionDetails!.chain)
             getSpriteImage(pokemonNames: pokemonEvolutions)
             
             view.addSubview(pokemonView)
             pokemonView.addSubview(pokemonImageView)
-            pokemonView.bringSubviewToFront(pokemonImageView)
             
             guard let pokemonDetail = pokemonDetail else { return }
             for type in pokemonDetail.types{
@@ -105,21 +108,28 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             let gradient = CAGradientLayer()
             var cgColors: [CGColor] = pokemonTypeColors.map({ $0.cgColor })
             if cgColors.count == 1 {
-                cgColors.insert(UIColor.white.cgColor, at: 0)
+                cgColors.insert(UIColor.systemGray2.cgColor, at: 0)
             }
             gradient.colors =  cgColors
+            gradient.startPoint = CGPoint(x: 0, y: 1)
+            gradient.endPoint = CGPoint(x: 1, y: 1)
             gradient.frame = pokemonView.frame
             pokemonView.layer.insertSublayer(gradient, at: 0)
             
             view.addSubview(pokemonTableView)
-
+            
+            let gradient1 = CAGradientLayer()
+            
+            gradient1.colors = cgColors
+            gradient1.startPoint = CGPoint(x: 0, y: 0)
+            gradient1.endPoint = CGPoint(x: 1, y: 1)
+            gradient1.frame = pokemonTableView.frame
+           pokemonTableView.layer.insertSublayer(gradient1, at: 0)
+            
+           
             
             pokemonTableView.register(PokemonFlavorTextTableViewCell.self, forCellReuseIdentifier: PokemonFlavorTextTableViewCell.identifier)
             pokemonTableView.register(PokemonEvolutionsTableViewCell.self, forCellReuseIdentifier: PokemonEvolutionsTableViewCell.identifier)
-            
-            guard let details = pokemonSpeciesDetails, let evolution = pokemonEvolutionDetails else { return }
-            //print(details.flavor_text_entries)
-            //print(evolution.chain)
             
             NSLayoutConstraint.activate([
                 
@@ -131,7 +141,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
                 pokemonTableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 250),
                 pokemonTableView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
                 pokemonTableView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-                pokemonTableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+                pokemonTableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
                 
                 pokemonImageView.centerXAnchor.constraint(equalTo: pokemonView.centerXAnchor),
                 pokemonImageView.centerYAnchor.constraint(equalTo: pokemonView.centerYAnchor, constant: 50),
@@ -174,7 +184,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         
     } // end of fetch data
     
-    // MARK: Evolution Chain Getting Names
+    // MARK: Evolution Chain Getting Names and Images
     
     func getEvolutionNames(evolutionChain: PokemonEvolutions.Chain){
         //extract chains species name
@@ -287,6 +297,15 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         else if indexPath.row == 0 && indexPath.section == 1{
             let cellFlavor = tableView.dequeueReusableCell(withIdentifier: PokemonFlavorTextTableViewCell.identifier, for: indexPath) as! PokemonFlavorTextTableViewCell
             cellFlavor.pokemonFlavorTextViewModel = PokemonFlavorTextViewModel(pokemonSpeciesDetails!)
+            cellFlavor.delegate = self
+            
+            if let pokemonFact = pokemonFact{
+                cellFlavor.pokemonFlavorTextViewModel.flavorText = pokemonFact
+            }else{
+                print("no fact")
+            }
+           
+            
             return cellFlavor
         }
         else if indexPath.row == 1 && indexPath.section == 1{
@@ -338,9 +357,18 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             return 50
         }
         else if indexPath.section == 1 && indexPath.row == 0{
-            return 150
+            return 300
         }
         return 100
     }
 
+}
+
+
+extension PokemonDetailsViewController: PokemonFlavorTextTableViewCellDelegate{
+    
+    func pokemonFlavorTextTableViewCell(_ cell: PokemonFlavorTextTableViewCell, didTapWith viewModel: PokemonFlavorTextViewModel) {
+            pokemonFact = viewModel.flavorText
+    }
+    
 }
