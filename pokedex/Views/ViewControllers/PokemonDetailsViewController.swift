@@ -61,6 +61,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     var pokemonEvolutionImage: [UIImage] = []
     var evolutionLevel = 1
     var pokemonEvolutions: [PokemonEvolutionHierarchy] = []
+    var pokemonFact: String?
     
     private var isWaiting = false{
         didSet{
@@ -68,7 +69,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         }
     }
     
-    var pokemonFact: String?
+   
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -244,7 +245,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             return pokemonTypes.count
         }
         else if section == 1{
-            return 2
+            return 1
         }
         else if section == 2{
             return pokemonEvolutions.count
@@ -301,18 +302,13 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             
             if let pokemonFact = pokemonFact{
                 cellFlavor.pokemonFlavorTextViewModel.flavorText = pokemonFact
+                print("fact set")
             }else{
                 print("no fact")
             }
            
             
             return cellFlavor
-        }
-        else if indexPath.row == 1 && indexPath.section == 1{
-            cell.textLabel?.text = "New Fact"
-            cell.textLabel?.textColor = .blue
-            
-            return cell
         }
         else if  indexPath.section == 2{
             let cellEvolution = tableView.dequeueReusableCell(withIdentifier: PokemonEvolutionsTableViewCell.identifier, for: indexPath) as! PokemonEvolutionsTableViewCell
@@ -357,7 +353,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             return 50
         }
         else if indexPath.section == 1 && indexPath.row == 0{
-            return 300
+            return 200
         }
         return 100
     }
@@ -370,5 +366,6 @@ extension PokemonDetailsViewController: PokemonFlavorTextTableViewCellDelegate{
     func pokemonFlavorTextTableViewCell(_ cell: PokemonFlavorTextTableViewCell, didTapWith viewModel: PokemonFlavorTextViewModel) {
             pokemonFact = viewModel.flavorText
     }
+    
     
 }

@@ -9,6 +9,7 @@ import UIKit
 
 protocol PokemonFlavorTextTableViewCellDelegate: AnyObject{
     func pokemonFlavorTextTableViewCell(_ cell: PokemonFlavorTextTableViewCell, didTapWith viewModel: PokemonFlavorTextViewModel)
+    
 }
 
 class PokemonFlavorTextTableViewCell: UITableViewCell {
@@ -94,9 +95,10 @@ class PokemonFlavorTextTableViewCell: UITableViewCell {
             
             pokemonFact.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10),
             pokemonFact.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10),
-            pokemonFact.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            pokemonFact.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            pokemonFact.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
-            changeFactBtn.topAnchor.constraint(equalTo: pokemonFact.bottomAnchor, constant: 15),
+            changeFactBtn.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
             changeFactBtn.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10),
             changeFactBtn.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10)
         ])
