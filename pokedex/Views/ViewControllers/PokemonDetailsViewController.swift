@@ -12,8 +12,6 @@ struct PokemonEvolutionHierarchy{
         var evolutionLevel: Int
     }
 
-
-
 class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate  {
     
     // MARK: UI Components
@@ -305,6 +303,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
                 print("fact set")
             }else{
                 print("no fact")
+                pokemonFact = cellFlavor.setInitialFlavorText()
             }
            
             
@@ -324,7 +323,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         }
         
     }
-    
+
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
@@ -366,6 +365,5 @@ extension PokemonDetailsViewController: PokemonFlavorTextTableViewCellDelegate{
     func pokemonFlavorTextTableViewCell(_ cell: PokemonFlavorTextTableViewCell, didTapWith viewModel: PokemonFlavorTextViewModel) {
             pokemonFact = viewModel.flavorText
     }
-    
     
 }

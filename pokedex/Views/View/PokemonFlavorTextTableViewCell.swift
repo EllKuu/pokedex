@@ -60,6 +60,7 @@ class PokemonFlavorTextTableViewCell: UITableViewCell {
         contentView.addSubview(pokemonFact)
         contentView.addSubview(changeFactBtn)
         changeFactBtn.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
+        
     }
     
     @objc private func didTapButton(){
@@ -70,6 +71,15 @@ class PokemonFlavorTextTableViewCell: UITableViewCell {
         var newViewModel = viewModel
         newViewModel.flavorText = viewModel.flavorText
         delegate?.pokemonFlavorTextTableViewCell(self, didTapWith: newViewModel)
+    }
+    
+    func setInitialFlavorText() -> String{
+        guard let viewModel = viewModel else { return "nothing" }
+        
+        var newViewModel = viewModel
+        newViewModel.flavorText = viewModel.flavorText
+        
+        return newViewModel.flavorText
     }
     
     required init?(coder: NSCoder) {
