@@ -8,9 +8,9 @@
 import UIKit
 
 struct PokemonEvolutionHierarchy{
-        var pokemonName: String
-        var evolutionLevel: Int
-    }
+    var pokemonName: String
+    var evolutionLevel: Int
+}
 
 class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate  {
     
@@ -67,19 +67,21 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         }
     }
     
-   
-
     override func viewDidLoad() {
         super.viewDidLoad()
         isWaiting = true
         guard let pokemonDetail = pokemonDetail else { return }
         fetchData(speciesUrl: pokemonDetail)
+        setupViewController()
+        
+    }
+    
+    // MARK: ViewController Setup
+    private func setupViewController(){
         view.backgroundColor = .red
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationItem.largeTitleDisplayMode = .always
-        
-        
     }
     
     // MARK: Fetch Data and UIUpdate
@@ -89,65 +91,64 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             print("API running")
         }else{
             view.backgroundColor = .clear
-           
+            
             getEvolutionNames(evolutionChain: pokemonEvolutionDetails!.chain)
             getSpriteImage(pokemonNames: pokemonEvolutions)
+            setupPokemonTypesAndColors()
             
             view.addSubview(pokemonView)
             pokemonView.addSubview(pokemonImageView)
-            
-            guard let pokemonDetail = pokemonDetail else { return }
-            for type in pokemonDetail.types{
-                let pokemonType = type.type.name
-                pokemonTypes.append(pokemonType)
-                let color = PokemonColors.shared.pokemonGradientColors(pokemonType: pokemonType)
-                pokemonTypeColors.append(color)
-            }
-            
-            let gradient = CAGradientLayer()
-            var cgColors: [CGColor] = pokemonTypeColors.map({ $0.cgColor })
-            if cgColors.count == 1 {
-                cgColors.insert(UIColor.systemGray2.cgColor, at: 0)
-            }
-            gradient.colors =  cgColors
-            gradient.startPoint = CGPoint(x: 0, y: 1)
-            gradient.endPoint = CGPoint(x: 1, y: 1)
-            gradient.frame = pokemonView.frame
-            pokemonView.layer.insertSublayer(gradient, at: 0)
-            
             view.addSubview(pokemonTableView)
+            registerCells()
+            activateConstraints()
             
-            let gradient1 = CAGradientLayer()
-            
-            gradient1.colors = cgColors
-            gradient1.startPoint = CGPoint(x: 0, y: 0)
-            gradient1.endPoint = CGPoint(x: 1, y: 1)
-            gradient1.frame = pokemonTableView.frame
-           pokemonTableView.layer.insertSublayer(gradient1, at: 0)
-            
+            pokemonView.layer.insertSublayer(PokemonColors.shared.createPokemonTypesGradient(
+                                                colors: pokemonTypeColors,
+                                                startCoordinate: .unitCoordinate(.topLeft),
+                                                endCoordinate: .unitCoordinate(.bottomRight),
+                                                frame: pokemonView.frame), at: 0)
            
-            
-            pokemonTableView.register(PokemonFlavorTextTableViewCell.self, forCellReuseIdentifier: PokemonFlavorTextTableViewCell.identifier)
-            pokemonTableView.register(PokemonEvolutionsTableViewCell.self, forCellReuseIdentifier: PokemonEvolutionsTableViewCell.identifier)
-            
-            NSLayoutConstraint.activate([
-                
-                pokemonView.topAnchor.constraint(equalTo: self.view.topAnchor),
-                pokemonView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
-                pokemonView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-                pokemonView.bottomAnchor.constraint(equalTo: pokemonTableView.topAnchor, constant: 50),
-                
-                pokemonTableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 250),
-                pokemonTableView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
-                pokemonTableView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-                pokemonTableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
-                
-                pokemonImageView.centerXAnchor.constraint(equalTo: pokemonView.centerXAnchor),
-                pokemonImageView.centerYAnchor.constraint(equalTo: pokemonView.centerYAnchor, constant: 50),
-                pokemonImageView.widthAnchor.constraint(equalTo: pokemonView.widthAnchor, constant: -200),
-                pokemonImageView.heightAnchor.constraint(equalTo: pokemonView.heightAnchor, constant: -200),
-            ])
+            pokemonTableView.layer.insertSublayer(PokemonColors.shared.createPokemonTypesGradient(
+                                                    colors: pokemonTypeColors,
+                                                    startCoordinate: .unitCoordinate(.topLeft),
+                                                    endCoordinate: .unitCoordinate(.bottomRight),
+                                                    frame: pokemonTableView.frame), at: 0)
         }
+    }
+    
+    private func setupPokemonTypesAndColors(){
+        guard let pokemonDetail = pokemonDetail else { return }
+        for type in pokemonDetail.types{
+            let pokemonType = type.type.name
+            pokemonTypes.append(pokemonType)
+            let color = PokemonColors.shared.pokemonGradientColors(pokemonType: pokemonType)
+            pokemonTypeColors.append(color)
+        }
+    }
+    
+    private func registerCells(){
+        pokemonTableView.register(PokemonFlavorTextTableViewCell.self, forCellReuseIdentifier: PokemonFlavorTextTableViewCell.identifier)
+        pokemonTableView.register(PokemonEvolutionsTableViewCell.self, forCellReuseIdentifier: PokemonEvolutionsTableViewCell.identifier)
+    }
+    
+    private func activateConstraints(){
+        NSLayoutConstraint.activate([
+            
+            pokemonView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            pokemonView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+            pokemonView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+            pokemonView.bottomAnchor.constraint(equalTo: pokemonTableView.topAnchor, constant: 50),
+            
+            pokemonTableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 250),
+            pokemonTableView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+            pokemonTableView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+            pokemonTableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
+            
+            pokemonImageView.centerXAnchor.constraint(equalTo: pokemonView.centerXAnchor),
+            pokemonImageView.centerYAnchor.constraint(equalTo: pokemonView.centerYAnchor, constant: 50),
+            pokemonImageView.widthAnchor.constraint(equalTo: pokemonView.widthAnchor, constant: -200),
+            pokemonImageView.heightAnchor.constraint(equalTo: pokemonView.heightAnchor, constant: -200),
+        ])
     }
     
     private func fetchData(speciesUrl: PokemonDetails){
@@ -180,14 +181,14 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
                 }
             }
         }
-        
-    } // end of fetch data
+    }
     
     // MARK: Evolution Chain Getting Names and Images
     
     func getEvolutionNames(evolutionChain: PokemonEvolutions.Chain){
         //extract chains species name
-        let pokemonEvo = PokemonEvolutionHierarchy(pokemonName: evolutionChain.species.name, evolutionLevel: evolutionLevel)
+        let pokemonEvo = PokemonEvolutionHierarchy(pokemonName: evolutionChain.species.name,
+                                                   evolutionLevel: evolutionLevel)
         pokemonEvolutions.append(pokemonEvo)
         
         //check if chain has any chainlinks in evolve to
@@ -197,22 +198,23 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         }
     }
     
+    
     func traverseChain(chainLink: [PokemonEvolutions.ChainLink]){
         
         var pokemonEvo: PokemonEvolutionHierarchy
         
         if chainLink.count > 1 {
-            
             for item in chainLink{
-                pokemonEvo = PokemonEvolutionHierarchy(pokemonName: item.species.name, evolutionLevel: evolutionLevel)
+                pokemonEvo = PokemonEvolutionHierarchy(pokemonName: item.species.name,
+                                                                                 evolutionLevel: evolutionLevel)
                 pokemonEvolutions.append(pokemonEvo)
-               
             }
         }
         else{
             for item in chainLink{
                 
-                pokemonEvo = PokemonEvolutionHierarchy(pokemonName: item.species.name, evolutionLevel: evolutionLevel)
+                pokemonEvo = PokemonEvolutionHierarchy(pokemonName: item.species.name,
+                                                                                 evolutionLevel: evolutionLevel)
                 pokemonEvolutions.append(pokemonEvo)
                 
                 if !item.evolves_to.isEmpty{
@@ -222,6 +224,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             }
         }
     }
+    
     
     func getSpriteImage(pokemonNames: [PokemonEvolutionHierarchy]){
         for name in pokemonNames {
@@ -233,7 +236,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         }
     }
     
-
+    
     
     // MARK: TableView Functions
     
@@ -248,7 +251,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         else if section == 2{
             return pokemonEvolutions.count
         }
-        return 3
+        return 1
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -257,8 +260,8 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         view.tintColor = UIColor.red
-           let header = view as! UITableViewHeaderFooterView
-           header.textLabel?.textColor = UIColor.white
+        let header = view as! UITableViewHeaderFooterView
+        header.textLabel?.textColor = UIColor.white
         header.textLabel?.textAlignment = .center
         header.textLabel?.font = UIFont(name: "Arial", size: 15)
     }
@@ -271,14 +274,8 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             return "About"
         case 2:
             return "Evolutions"
-        case 3:
-            return "Stats"
-        case 4:
-            return "Moves"
-        case 5:
-            return "Details"
         default:
-            return "last"
+            return ""
         }
     }
     
@@ -300,39 +297,24 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             
             if let pokemonFact = pokemonFact{
                 cellFlavor.pokemonFlavorTextViewModel.flavorText = pokemonFact
-                print("fact set")
             }else{
-                print("no fact")
                 pokemonFact = cellFlavor.setInitialFlavorText()
             }
-           
-            
             return cellFlavor
+            
         }
         else if  indexPath.section == 2{
             let cellEvolution = tableView.dequeueReusableCell(withIdentifier: PokemonEvolutionsTableViewCell.identifier, for: indexPath) as! PokemonEvolutionsTableViewCell
             cellEvolution.pokemonEvolutionsModel = PokemonEvolutionsViewModel( pokemonEvolutionImage[indexPath.row], pokemonEvolutions[indexPath.row])
-           
             return cellEvolution
             
         }
-        
-        else{
-            cell.textLabel?.text = "hi"
-            return cell
-        }
-        
+        return cell
     }
-
+    
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
-        
-        if indexPath.section == 1 && indexPath.row == 1{
-            let idx = IndexPath(row: 0, section: 1)
-            let cell = tableView.cellForRow(at: idx) as? PokemonFlavorTextTableViewCell
-            cell?.pokemonFlavorTextViewModel.changeFlavorText()
-        }
     }
     
     func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
@@ -356,14 +338,14 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         }
         return 100
     }
-
+    
 }
 
 
 extension PokemonDetailsViewController: PokemonFlavorTextTableViewCellDelegate{
     
     func pokemonFlavorTextTableViewCell(_ cell: PokemonFlavorTextTableViewCell, didTapWith viewModel: PokemonFlavorTextViewModel) {
-            pokemonFact = viewModel.flavorText
+        pokemonFact = viewModel.flavorText
     }
     
 }

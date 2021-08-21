@@ -55,4 +55,21 @@ struct PokemonColors {
         }
     }
     
+    func createPokemonTypesGradient(colors: [UIColor], startCoordinate: CGPoint, endCoordinate: CGPoint, frame: CGRect) -> CAGradientLayer{
+        
+        let gradient = CAGradientLayer()
+        
+        var cgColors: [CGColor] = colors.map({ $0.cgColor })
+        if cgColors.count == 1 {
+            cgColors.insert(UIColor.systemGray2.cgColor, at: 0)
+        }
+        gradient.colors = cgColors
+        gradient.startPoint = startCoordinate
+        gradient.endPoint = endCoordinate
+        gradient.frame = frame
+        
+        return gradient
+        
+    }
+    
 }
