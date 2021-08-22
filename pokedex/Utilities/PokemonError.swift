@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 enum PokemonError: String, Error {
     case unableToComplete = "Unable to complete request."
@@ -14,3 +15,4 @@ enum PokemonError: String, Error {
     case invalidMime = "Response from server is invalid"
     case pokemonDetailDataInvalid = "Pokemon url data is invalid."
 }
+

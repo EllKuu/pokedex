@@ -16,6 +16,16 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     
     // MARK: UI Components
     
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView()
+        indicator.color = .blue
+        indicator.style = .large
+        indicator.hidesWhenStopped = true
+        indicator.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
     private lazy var pokemonTableView: UITableView = {
         let table = UITableView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height), style: .insetGrouped)
         table.backgroundColor = .clear
@@ -69,6 +79,9 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
+        activateIndicatorConstraints()
         isWaiting = true
         guard let pokemonDetail = pokemonDetail else { return }
         fetchData(speciesUrl: pokemonDetail)
@@ -78,7 +91,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     
     // MARK: ViewController Setup
     private func setupViewController(){
-        view.backgroundColor = .red
+        view.backgroundColor = .white
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationItem.largeTitleDisplayMode = .always
@@ -91,7 +104,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             print("API running")
         }else{
             view.backgroundColor = .clear
-            
+            activityIndicator.stopAnimating()
             getEvolutionNames(evolutionChain: pokemonEvolutionDetails!.chain)
             getSpriteImage(pokemonNames: pokemonEvolutions)
             setupPokemonTypesAndColors()
@@ -100,7 +113,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
             pokemonView.addSubview(pokemonImageView)
             view.addSubview(pokemonTableView)
             registerCells()
-            activateConstraints()
+            activateDetailConstraints()
             
             pokemonView.layer.insertSublayer(PokemonColors.shared.createPokemonTypesGradient(
                                                 colors: pokemonTypeColors,
@@ -131,7 +144,14 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         pokemonTableView.register(PokemonEvolutionsTableViewCell.self, forCellReuseIdentifier: PokemonEvolutionsTableViewCell.identifier)
     }
     
-    private func activateConstraints(){
+    func activateIndicatorConstraints(){
+        NSLayoutConstraint.activate([
+            activityIndicator.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+            activityIndicator.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+        ])
+    }
+    
+    private func activateDetailConstraints(){
         NSLayoutConstraint.activate([
             
             pokemonView.topAnchor.constraint(equalTo: self.view.topAnchor),
@@ -172,12 +192,14 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
                                 strongSelf.isWaiting = false
                             case .failure(let error):
                                 print("evolution - \(error.rawValue)")
+                                self?.pokemonErrorAlertUser(title: "Error", message: error.rawValue)
                             }
                         }
                     }
                     
                 case .failure(let error):
                     print("species - \(error.rawValue)")
+                    self?.pokemonErrorAlertUser(title: "Error", message: error.rawValue)
                 }
             }
         }

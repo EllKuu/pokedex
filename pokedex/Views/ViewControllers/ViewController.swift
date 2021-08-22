@@ -13,9 +13,6 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     var pokemonListResult: PokemonList?
     private var pokemonDetailsArray = [PokemonDetails]()
   
-    
-    
-    
     private var isWaiting = false{
         didSet{
             self.updateUI()
@@ -45,41 +42,59 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         return collectionView
     }()
     
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView()
+        indicator.color = .blue
+        indicator.style = .large
+        indicator.hidesWhenStopped = true
+        indicator.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.isWaiting = true
-        self.view.backgroundColor = .red
+        self.view.backgroundColor = .white
+        view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
         title = "PokeDex"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationItem.largeTitleDisplayMode = .always
         fetchData()
-    }// end of view did load
+        activateIndicatorConstraints()
+    }
     
     func updateUI(){
         if isWaiting{
             print("API running")
         }else{
+            activityIndicator.stopAnimating()
             self.view.addSubview(pokemonCollectionView)
-            
-            NSLayoutConstraint.activate([
-                pokemonCollectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
-                pokemonCollectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
-                pokemonCollectionView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-                pokemonCollectionView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor)
-            ])
-            
-            
             self.view.backgroundColor = .white
-            print(self.pokemonListResult?.results.count)
-            //print(self.pokemonDetailsArray)
-            
             self.pokemonDetailsArray.sort(by: {$0.id < $1.id})
             
-//            for p in self.pokemonDetailsArray {
-//                print(p.id, p.name)
-//            }
+            activateCollectionViewConstraints()
+            
         }
+    }
+    
+    func activateIndicatorConstraints(){
+        NSLayoutConstraint.activate([
+            activityIndicator.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+            activityIndicator.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+        ])
+       
+    }
+    
+    func activateCollectionViewConstraints(){
+        NSLayoutConstraint.activate([
+            pokemonCollectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            pokemonCollectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+            pokemonCollectionView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+            pokemonCollectionView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor)
+        ])
     }
     
     func fetchData(){
@@ -105,12 +120,14 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
 
                             case .failure(let error):
                                 print("Details - \(error.rawValue)")
+                                self?.pokemonErrorAlertUser(title: "Error", message: error.rawValue)
                             }
                         }
                     }// end of getPokemonDetails
                 
                 case .failure(let error):
                     print("PokemonList - \(error.rawValue)")
+                    self?.pokemonErrorAlertUser(title: "Error", message: error.rawValue)
                 }
             }
         }// end of getPokemonList
