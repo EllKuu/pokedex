@@ -8,11 +8,27 @@
 import UIKit
 import Foundation
 
-class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+
+class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UISearchResultsUpdating {
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let text = searchController.searchBar.text else { return }
+        filterPokemonForSearchText(text)
+    }
+    
     
     var pokemonListResult: PokemonList?
     private var pokemonDetailsArray = [PokemonDetails]()
-  
+    var filteredPokemonDetailsArray = [PokemonDetails]()
+    
+    var isSearchBarEmpty: Bool{
+        return searchController.searchBar.text?.isEmpty ?? true
+    }
+    
+    var isFiltering: Bool {
+        return searchController.isActive && !isSearchBarEmpty
+    }
+    
     private var isWaiting = false{
         didSet{
             self.updateUI()
@@ -22,15 +38,15 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     private lazy var pokemonCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let cellWidthHeightConstant: CGFloat = view.frame.size.width / 2.5
-
-                layout.sectionInset = UIEdgeInsets(top: 0,
-                                                   left: 5,
-                                                   bottom: 0,
-                                                   right: 5)
-                layout.scrollDirection = .vertical
-                layout.minimumInteritemSpacing = 2
-                layout.minimumLineSpacing = 6
-                layout.itemSize = CGSize(width: cellWidthHeightConstant + 30, height: cellWidthHeightConstant)
+        
+        layout.sectionInset = UIEdgeInsets(top: 0,
+                                           left: 5,
+                                           bottom: 0,
+                                           right: 5)
+        layout.scrollDirection = .vertical
+        layout.minimumInteritemSpacing = 2
+        layout.minimumLineSpacing = 6
+        layout.itemSize = CGSize(width: cellWidthHeightConstant + 30, height: cellWidthHeightConstant)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(PokemonCollectionViewCell.self, forCellWithReuseIdentifier: "PokemonCollectionViewCell")
@@ -38,7 +54,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-       
+        
         return collectionView
     }()
     
@@ -52,6 +68,8 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         return indicator
     }()
     
+    let searchController = UISearchController()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.isWaiting = true
@@ -59,11 +77,27 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
         title = "PokeDex"
+        setupNavigation()
+        fetchData()
+        activateIndicatorConstraints()
+    }
+    
+    func setupNavigation(){
+        navigationItem.searchController = searchController
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search Pokemon"
+        definesPresentationContext = true
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationItem.largeTitleDisplayMode = .always
-        fetchData()
-        activateIndicatorConstraints()
+    }
+    
+    func filterPokemonForSearchText(_ searchText: String, type: PokemonDetails.Type? = nil){
+        filteredPokemonDetailsArray = pokemonDetailsArray.filter({ (pokemon: PokemonDetails) -> Bool in
+            return pokemon.name.lowercased().contains(searchText.lowercased())
+        })
+        pokemonCollectionView.reloadData()
     }
     
     func updateUI(){
@@ -74,9 +108,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             self.view.addSubview(pokemonCollectionView)
             self.view.backgroundColor = .white
             self.pokemonDetailsArray.sort(by: {$0.id < $1.id})
-            
             activateCollectionViewConstraints()
-            
         }
     }
     
@@ -85,7 +117,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             activityIndicator.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
             activityIndicator.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
         ])
-       
+        
     }
     
     func activateCollectionViewConstraints(){
@@ -110,14 +142,14 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
                     // Get pokemon Details from PokemonList
                     NetworkEngine.shared.getPokemonDetails(pokemonList: pokemonDetails) { [weak self] result in
                         guard let strongSelf = self else { return }
-
+                        
                         DispatchQueue.main.async {
                             switch result{
                             case .success(let pokemonDetails):
                                 strongSelf.pokemonDetailsArray = pokemonDetails
                                 
                                 strongSelf.isWaiting = false
-
+                                
                             case .failure(let error):
                                 print("Details - \(error.rawValue)")
                                 self?.pokemonErrorAlertUser(title: "Error", message: error.rawValue)
@@ -137,24 +169,38 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     // MARK: UICollectionView Functions
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if isFiltering{
+            return filteredPokemonDetailsArray.count
+        }
         return pokemonDetailsArray.count
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PokemonCollectionViewCell.identifier, for: indexPath) as! PokemonCollectionViewCell
-        //cell.pokemonDetailsModel = pokemonDetailsArray[indexPath.row]
-        cell.pokemonDetailsModel = PokemonViewModel(pokemonDetailsArray[indexPath.row])
+        
+        if isFiltering{
+            cell.pokemonDetailsModel = PokemonViewModel(filteredPokemonDetailsArray[indexPath.row])
+        }else{
+            cell.pokemonDetailsModel = PokemonViewModel(pokemonDetailsArray[indexPath.row])
+        }
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = PokemonDetailsViewController()
-        // call pokemonVC fetch function and send url for species from indexpath
+        
         vc.modalPresentationStyle = .formSheet
-        vc.title = "\(pokemonDetailsArray[indexPath.row].name.capitalized)"
-        vc.pokemonDetail = pokemonDetailsArray[indexPath.row]
-        vc.pokemonImage = pokemonDetailsArray[indexPath.row].sprites.front_default
         vc.pokemonList = pokemonDetailsArray
+        if isFiltering{
+            vc.title = "\(filteredPokemonDetailsArray[indexPath.row].name.capitalized)"
+            vc.pokemonDetail = filteredPokemonDetailsArray[indexPath.row]
+            vc.pokemonImage = filteredPokemonDetailsArray[indexPath.row].sprites.front_default
+        }else{
+            vc.title = "\(pokemonDetailsArray[indexPath.row].name.capitalized)"
+            vc.pokemonDetail = pokemonDetailsArray[indexPath.row]
+            vc.pokemonImage = pokemonDetailsArray[indexPath.row].sprites.front_default
+        }
+        
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
