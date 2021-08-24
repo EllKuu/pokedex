@@ -10,7 +10,7 @@ import Foundation
 class NetworkEngine{
     
     static let shared = NetworkEngine()
-    private let baseUrl = "https://pokeapi.co/api/v2/pokemon?limit=898&offset=0"
+    private let baseUrl = "https://pokeapi.co/api/v2/pokemon?limit=151&offset=0"
     
     private let pokemonResourceUrl = "https://pokeapi.co/api/v2/pokemon/{id or name}"
     private let pokemonSpeciesUrl = "https://pokeapi.co/api/v2/pokemon-species/{id}"
@@ -19,12 +19,6 @@ class NetworkEngine{
     
     let session = URLSession.shared
     let pokemonDecoder = JSONDecoder()
-    
-    func testFunc(){
-        for i in 1...5{
-            print("\(i) - Count")
-        }
-    }
     
     func getPokemonList(completed: @escaping (Result<PokemonList, PokemonError>) -> Void){
         

@@ -35,7 +35,7 @@ class PokemonCollectionViewCell: UICollectionViewCell {
     
     lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont(name: "HelveticaNeue", size: 14)
+        label.font = UIFont(name: "arial", size: 14)
         label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textColor = .white
         label.textAlignment = .center

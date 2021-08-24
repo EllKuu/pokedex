@@ -8,13 +8,21 @@
 import UIKit
 import Foundation
 
-
-class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UISearchResultsUpdating {
+class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
     
     func updateSearchResults(for searchController: UISearchController) {
         guard let text = searchController.searchBar.text else { return }
-        filterPokemonForSearchText(text)
+//        let vc = searchController.searchResultsController as? SearchResultsViewController
+//        vc?.view.backgroundColor = .systemPink
+        //filterPokemonForSearchText(text)
     }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        let vc = searchController.searchResultsController as? SearchResultsViewController
+        
+    }
+    
+    
     
     
     var pokemonListResult: PokemonList?
@@ -68,7 +76,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         return indicator
     }()
     
-    let searchController = UISearchController()
+    let searchController = UISearchController(searchResultsController: SearchResultsViewController())
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,17 +85,20 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
         title = "PokeDex"
-        setupNavigation()
         fetchData()
         activateIndicatorConstraints()
     }
     
-    func setupNavigation(){
+    func setupNavigationAndSearchbar(){
         navigationItem.searchController = searchController
         searchController.searchResultsUpdater = self
+        searchController.delegate = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Search Pokemon"
         definesPresentationContext = true
+        searchController.showsSearchResultsController = true
+        //searchController.searchBar.
+        
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationItem.largeTitleDisplayMode = .always
@@ -105,6 +116,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             print("API running")
         }else{
             activityIndicator.stopAnimating()
+            setupNavigationAndSearchbar()
             self.view.addSubview(pokemonCollectionView)
             self.view.backgroundColor = .white
             self.pokemonDetailsArray.sort(by: {$0.id < $1.id})
@@ -137,7 +149,6 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
                 switch result{
                 case .success(let pokemonDetails):
                     strongSelf.pokemonListResult = pokemonDetails
-                    
                     
                     // Get pokemon Details from PokemonList
                     NetworkEngine.shared.getPokemonDetails(pokemonList: pokemonDetails) { [weak self] result in
