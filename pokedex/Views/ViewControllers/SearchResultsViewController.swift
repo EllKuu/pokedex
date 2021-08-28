@@ -7,6 +7,7 @@
 
 import UIKit
 
+
 class HeaderCollectionReusableView: UICollectionReusableView{
     static let identifier = "HeaderCollectionReusableView"
     
@@ -38,7 +39,9 @@ class SearchResultsViewController: UIViewController, UICollectionViewDelegate, U
     
     let pokemonRegions: [String] = ["kanto", "johto", "hoenn", "sinnoh", "unova", "kalos", "alola", "galar"]
     
-
+    var delegate:SelectedCategoryProtocol?
+    
+    
     //MARK: Components
     
     lazy var searchOptionsCollectionView: UICollectionView = {
@@ -60,8 +63,6 @@ class SearchResultsViewController: UIViewController, UICollectionViewDelegate, U
         collectionView.backgroundColor = .white
         collectionView.delegate = self
         collectionView.dataSource = self
-        //collectionView.isUserInteractionEnabled = true
-        //collectionView.bringSubviewToFront(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         collectionView.register(SearchCategoryCollectionViewCell.self, forCellWithReuseIdentifier: SearchCategoryCollectionViewCell.identifier)
@@ -74,19 +75,40 @@ class SearchResultsViewController: UIViewController, UICollectionViewDelegate, U
         super.viewDidLoad()
         view.backgroundColor = .systemPink
         view.addSubview(searchOptionsCollectionView)
+        
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    }
+    
+    @objc func adjustForKeyboard(notification: Notification) {
+        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+
+        let keyboardScreenEndFrame = keyboardValue.cgRectValue
+        let keyboardViewEndFrame = view.convert(keyboardScreenEndFrame, from: view.window)
+
+        if notification.name == UIResponder.keyboardWillHideNotification {
+            searchOptionsCollectionView.contentInset = .zero
+        } else {
+            searchOptionsCollectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height - view.safeAreaInsets.bottom, right: 0)
+        }
+
+        searchOptionsCollectionView.scrollIndicatorInsets = searchOptionsCollectionView.contentInset
+
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        searchOptionsCollectionView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height/2)
+        searchOptionsCollectionView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height)
+        activateConstraints()
     }
     
     func activateConstraints(){
         NSLayoutConstraint.activate([
-            searchOptionsCollectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            searchOptionsCollectionView.topAnchor.constraint(equalTo: self.view.topAnchor),
             searchOptionsCollectionView.leftAnchor.constraint(equalTo: self.view.leftAnchor),
             searchOptionsCollectionView.rightAnchor.constraint(equalTo: self.view.rightAnchor),
-            searchOptionsCollectionView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor)
+            searchOptionsCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
         ])
     }
 
@@ -143,10 +165,22 @@ class SearchResultsViewController: UIViewController, UICollectionViewDelegate, U
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("category selected")
+        if let cell = collectionView.cellForItem(at: indexPath) as? SearchCategoryCollectionViewCell{
+            print(cell.titleLabel.text)
+            
+            
+            self.delegate?.didSelectCategory(text: cell.titleLabel.text!)
+//            self.dismiss(animated: true) {
+//                self.delegate?.didSelectCategory(text: cell.titleLabel.text!)
+//            }
+            
+            
+        }
     }
-    
-    
-    
-
+  
 }
+
+protocol SelectedCategoryProtocol{
+    func didSelectCategory(text: String)
+}
+

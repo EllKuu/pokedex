@@ -8,20 +8,35 @@
 import UIKit
 import Foundation
 
-class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
+class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate, SelectedCategoryProtocol {
+    
+    func didSelectCategory(text: String) {
+        
+        searchResultsController.searchBar.text = text
+    }
+    
     
     func updateSearchResults(for searchController: UISearchController) {
         guard let text = searchController.searchBar.text else { return }
-//        let vc = searchController.searchResultsController as? SearchResultsViewController
-//        vc?.view.backgroundColor = .systemPink
-        //filterPokemonForSearchText(text)
+        print(text)
+        //searchResultsController.showsSearchResultsController = false
+        filterPokemonForSearchText(text)
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        let vc = searchController.searchResultsController as? SearchResultsViewController
-        
+        print("search began")
+        searchResultsController.showsSearchResultsController = true
     }
     
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchResultsController.showsSearchResultsController = false
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        print("search clicked")
+        //searchResultsController.dismiss(animated: true, completion: nil)
+        searchResultsController.showsSearchResultsController = false
+    }
     
     
     
@@ -30,11 +45,11 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     var filteredPokemonDetailsArray = [PokemonDetails]()
     
     var isSearchBarEmpty: Bool{
-        return searchController.searchBar.text?.isEmpty ?? true
+        return searchResultsController.searchBar.text?.isEmpty ?? true
     }
     
     var isFiltering: Bool {
-        return searchController.isActive && !isSearchBarEmpty
+        return searchResultsController.isActive && !isSearchBarEmpty
     }
     
     private var isWaiting = false{
@@ -76,7 +91,11 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         return indicator
     }()
     
-    let searchController = UISearchController(searchResultsController: SearchResultsViewController())
+
+    let resultsController = SearchResultsViewController()
+    var searchResultsController = UISearchController()
+    var searchController = UISearchController()
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,26 +109,35 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     
     func setupNavigationAndSearchbar(){
-        navigationItem.searchController = searchController
-        searchController.searchResultsUpdater = self
-        searchController.delegate = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search Pokemon"
-        definesPresentationContext = true
-        searchController.showsSearchResultsController = true
-        //searchController.searchBar.
+       
+        resultsController.delegate = self
+        searchResultsController = UISearchController(searchResultsController: resultsController)
+        navigationItem.searchController = searchResultsController
+        self.definesPresentationContext = true
+        searchResultsController.searchResultsUpdater = self
+        searchResultsController.delegate = self
+        searchResultsController.searchBar.delegate = self
+        searchResultsController.obscuresBackgroundDuringPresentation = false
+        searchResultsController.searchBar.placeholder = "Search Pokemon"
+        searchResultsController.showsSearchResultsController = true
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationItem.largeTitleDisplayMode = .always
     }
     
-    func filterPokemonForSearchText(_ searchText: String, type: PokemonDetails.Type? = nil){
+    func filterPokemonForSearchText(_ searchText: String){
+        print("filtering")
         filteredPokemonDetailsArray = pokemonDetailsArray.filter({ (pokemon: PokemonDetails) -> Bool in
-            return pokemon.name.lowercased().contains(searchText.lowercased())
+            let type = pokemon.types.contains { pokemon in
+                pokemon.type.name.lowercased() == searchText.lowercased()
+            }
+            return type
+            //return pokemon.name.lowercased().contains(searchText.lowercased())
         })
         pokemonCollectionView.reloadData()
     }
+    
     
     func updateUI(){
         if isWaiting{
