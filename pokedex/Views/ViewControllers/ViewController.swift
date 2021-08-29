@@ -8,38 +8,9 @@
 import UIKit
 import Foundation
 
-class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate, SelectedCategoryProtocol {
+class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate, SelectedCategoryProtocol, UIScrollViewDelegate {
     
-    func didSelectCategory(text: String) {
-        
-        searchResultsController.searchBar.text = text
-    }
-    
-    
-    func updateSearchResults(for searchController: UISearchController) {
-        guard let text = searchController.searchBar.text else { return }
-        print(text)
-        //searchResultsController.showsSearchResultsController = false
-        filterPokemonForSearchText(text)
-    }
-    
-    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        print("search began")
-        searchResultsController.showsSearchResultsController = true
-    }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        searchResultsController.showsSearchResultsController = false
-    }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        print("search clicked")
-        //searchResultsController.dismiss(animated: true, completion: nil)
-        searchResultsController.showsSearchResultsController = false
-    }
-    
-    
-    
+   // MARK: Properties and UIComponents
     var pokemonListResult: PokemonList?
     private var pokemonDetailsArray = [PokemonDetails]()
     var filteredPokemonDetailsArray = [PokemonDetails]()
@@ -77,6 +48,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.keyboardDismissMode = .onDrag
         
         return collectionView
     }()
@@ -96,6 +68,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     var searchResultsController = UISearchController()
     var searchController = UISearchController()
 
+    // MARK: Loading and Setup
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -109,7 +82,6 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     }
     
     func setupNavigationAndSearchbar(){
-       
         resultsController.delegate = self
         searchResultsController = UISearchController(searchResultsController: resultsController)
         navigationItem.searchController = searchResultsController
@@ -125,19 +97,6 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         navigationController?.navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationItem.largeTitleDisplayMode = .always
     }
-    
-    func filterPokemonForSearchText(_ searchText: String){
-        print("filtering")
-        filteredPokemonDetailsArray = pokemonDetailsArray.filter({ (pokemon: PokemonDetails) -> Bool in
-            let type = pokemon.types.contains { pokemon in
-                pokemon.type.name.lowercased() == searchText.lowercased()
-            }
-            return type
-            //return pokemon.name.lowercased().contains(searchText.lowercased())
-        })
-        pokemonCollectionView.reloadData()
-    }
-    
     
     func updateUI(){
         if isWaiting{
@@ -242,6 +201,92 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         
         self.navigationController?.pushViewController(vc, animated: true)
     }
+    
+    
+    // MARK: Searching Functions
+    
+    func didSelectCategory(text: String) {
+        searchResultsController.searchBar.text = text
+        searchResultsController.showsSearchResultsController = false
+    }
+    
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let text = searchController.searchBar.text else { return }
+        print(text)
+        filterPokemonForSearchText(text)
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        print("search began")
+        if searchBar.searchTextField.text == "" {
+            searchResultsController.showsSearchResultsController = true
+        }
+        else{
+            searchResultsController.showsSearchResultsController = false
+        }
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.searchTextField.text == "" {
+            searchResultsController.showsSearchResultsController = true
+        }
+        else{
+            searchResultsController.showsSearchResultsController = false
+        }
+    }
+    
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        print("search clicked")
+        searchResultsController.showsSearchResultsController = false
+    }
+    
+    
+    
+    func filterPokemonForSearchText(_ searchText: String){
+        print("filtering")
+        filteredPokemonDetailsArray = pokemonDetailsArray.filter({ (pokemon: PokemonDetails) -> Bool in
+            let type = pokemon.types.contains { pokemon in
+                pokemon.type.name.lowercased() == searchText.lowercased()
+            }
+            
+            let name =  pokemon.name.lowercased().contains(searchText.lowercased())
+            
+            let region = findPokemonByRegion(region: searchText)
+            let pokemonByRegion = region.contains(pokemon.id)
+            
+            return type || name || pokemonByRegion
+            
+        })
+        pokemonCollectionView.reloadData()
+    }
+    
+    func findPokemonByRegion(region: String) -> [Int]{
+        var regionRange = [Int]()
+        switch region.lowercased() {
+        case "kanto":
+            regionRange = Array(1...151)
+        case "johto":
+            regionRange = Array(152...251)
+        case "hoenn":
+            regionRange = Array(252...386)
+        case "sinnoh":
+            regionRange = Array(387...493)
+        case "unova":
+            regionRange = Array(494...649)
+        case "kalos":
+            regionRange = Array(650...721)
+        case "alola":
+            regionRange = Array(722...809)
+        case "galar":
+            regionRange = Array(810...898)
+        default:
+            regionRange = []
+        }
+        return regionRange
+    }
+    
     
     
 } // end of class VC
