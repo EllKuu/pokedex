@@ -12,9 +12,9 @@ class NetworkEngine{
     static let shared = NetworkEngine()
     private let baseUrl = "https://pokeapi.co/api/v2/pokemon?limit=898&offset=0"
     
-    private let pokemonResourceUrl = "https://pokeapi.co/api/v2/pokemon/{id or name}"
-    private let pokemonSpeciesUrl = "https://pokeapi.co/api/v2/pokemon-species/{id}"
-    private let pokemonEvolutionsUrl = "https://pokeapi.co/api/v2/evolution-chain/{id}"
+    //private let pokemonResourceUrl = "https://pokeapi.co/api/v2/pokemon/{id or name}"
+    //private let pokemonSpeciesUrl = "https://pokeapi.co/api/v2/pokemon-species/{id}"
+    //private let pokemonEvolutionsUrl = "https://pokeapi.co/api/v2/evolution-chain/{id}"
     
     
     let session = URLSession.shared

@@ -32,8 +32,8 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
         table.dataSource = self
         table.delegate = self
         table.layer.cornerRadius = 25
-        table.layer.borderWidth = 5
-        table.layer.borderColor = UIColor.white.cgColor
+        //table.layer.borderWidth = 5
+        //table.layer.borderColor = UIColor.white.cgColor
         table.translatesAutoresizingMaskIntoConstraints = false
         
         return table
@@ -50,7 +50,6 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     private lazy var pokemonImageView: UIImageView = {
         let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         imageView.contentMode = .scaleAspectFill
-        //imageView.backgroundColor = .cyan
         let url = URL(string: pokemonImage ?? "")
         let data = try? Data(contentsOf: url!)
         imageView.image = UIImage(data: data!) ?? UIImage(systemName: "questionmark.circle")!
@@ -121,11 +120,11 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
                                                 endCoordinate: .unitCoordinate(.bottomRight),
                                                 frame: pokemonView.frame), at: 0)
            
-            pokemonTableView.layer.insertSublayer(PokemonColors.shared.createPokemonTypesGradient(
-                                                    colors: pokemonTypeColors,
-                                                    startCoordinate: .unitCoordinate(.topLeft),
-                                                    endCoordinate: .unitCoordinate(.bottomRight),
-                                                    frame: pokemonTableView.frame), at: 0)
+//            pokemonTableView.layer.insertSublayer(PokemonColors.shared.createPokemonTypesGradient(
+//                                                    colors: pokemonTypeColors,
+//                                                    startCoordinate: .unitCoordinate(.topLeft),
+//                                                    endCoordinate: .unitCoordinate(.bottomRight),
+//                                                    frame: pokemonTableView.frame), at: 0)
         }
     }
     

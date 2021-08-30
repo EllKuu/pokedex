@@ -90,7 +90,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         searchResultsController.delegate = self
         searchResultsController.searchBar.delegate = self
         searchResultsController.obscuresBackgroundDuringPresentation = false
-        searchResultsController.searchBar.placeholder = "Search Pokemon"
+        searchResultsController.searchBar.placeholder = "Search"
         searchResultsController.showsSearchResultsController = true
         
         navigationController?.navigationBar.prefersLargeTitles = true

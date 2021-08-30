@@ -38,6 +38,7 @@ class SearchResultsViewController: UIViewController, UICollectionViewDelegate, U
     let pokemonTypeCategory: [String] = ["bug", "dark", "dragon", "electric", "fairy", "fighting", "fire", "flying", "ghost", "grass", "ground", "ice", "normal", "poison", "psychic", "rock", "steel", "water"]
     
     let pokemonRegions: [String] = ["kanto", "johto", "hoenn", "sinnoh", "unova", "kalos", "alola", "galar"]
+    let pokemonRegionImage: [String] = ["circle", "capsule", "triangle", "square","rectangle.portrait", "diamond", "hexagon", "shield" ]
     
     var delegate:SelectedCategoryProtocol?
     
@@ -159,6 +160,7 @@ class SearchResultsViewController: UIViewController, UICollectionViewDelegate, U
         }
         else if indexPath.section == 1{
             cell.titleLabel.text = pokemonRegions[indexPath.row].capitalized
+            cell.categoryImage.image = UIImage(systemName: pokemonRegionImage[indexPath.row])
         }
         
         return cell
@@ -166,9 +168,7 @@ class SearchResultsViewController: UIViewController, UICollectionViewDelegate, U
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let cell = collectionView.cellForItem(at: indexPath) as? SearchCategoryCollectionViewCell{
-            print(cell.titleLabel.text)
             self.delegate?.didSelectCategory(text: cell.titleLabel.text!)
-            
         }
     }
     
