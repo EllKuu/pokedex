@@ -9,10 +9,12 @@ import Foundation
 import UIKit
 
 extension UIViewController{
-    func pokemonErrorAlertUser(title: String, message: String){
+    func pokemonErrorAlertUser(title: String, message: String, refresh: ()){
         let alertController = UIAlertController(title: title, message:
               message, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        alertController.addAction(UIAlertAction(title: "Try Again", style: .default, handler: { _ in
+            refresh
+        }))
             self.present(alertController, animated: true, completion: nil)
     }
     

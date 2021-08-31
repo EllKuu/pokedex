@@ -12,11 +12,6 @@ class NetworkEngine{
     static let shared = NetworkEngine()
     private let baseUrl = "https://pokeapi.co/api/v2/pokemon?limit=898&offset=0"
     
-    //private let pokemonResourceUrl = "https://pokeapi.co/api/v2/pokemon/{id or name}"
-    //private let pokemonSpeciesUrl = "https://pokeapi.co/api/v2/pokemon-species/{id}"
-    //private let pokemonEvolutionsUrl = "https://pokeapi.co/api/v2/evolution-chain/{id}"
-    
-    
     let session = URLSession.shared
     let pokemonDecoder = JSONDecoder()
     
@@ -49,7 +44,7 @@ class NetworkEngine{
                     completed(.success(pokemonResult))
                 }
                 catch{
-                    print("JSON Error \(error.localizedDescription)")
+                    //print("JSON Error \(error.localizedDescription)")
                     completed(.failure(.invalidData))
                 }
             }
@@ -74,7 +69,6 @@ class NetworkEngine{
             session.dataTask(with: newUrl!) { data, response, error in
                 
                 if error != nil {
-                    //print(error as Any)
                     completed(.failure(.unableToComplete))
                     return
                 }
@@ -93,7 +87,7 @@ class NetworkEngine{
                             completed(.success(pokemonDetailsArray))
                         }
                     }catch{
-                        print("JSON Error \(error.localizedDescription)")
+                        //print("JSON Error \(error.localizedDescription)")
                         completed(.failure(.invalidData))
                     }
                     
@@ -111,7 +105,7 @@ class NetworkEngine{
         
         session.dataTask(with: pokemonSpeciesUrl!) { data, response, error in
             if error != nil {
-                print(error as Any)
+                //print(error as Any)
                 completed(.failure(.unableToComplete))
                 return
             }
@@ -127,7 +121,7 @@ class NetworkEngine{
                     
                     completed(.success(pokemonSpecies))
                 }catch {
-                    print("JSON Error \(error.localizedDescription)")
+                    //print("JSON Error \(error.localizedDescription)")
                     completed(.failure(.invalidData))
                 }
             }
@@ -142,12 +136,11 @@ class NetworkEngine{
         
         session.dataTask(with: evolutionUrl!) { data, response, error in
             if error != nil {
-                print(error as Any)
+                //print(error as Any)
                 completed(.failure(.unableToComplete))
                 return
             }
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else{
-                
                 completed(.failure(.invalidData))
                 return
             }
@@ -158,7 +151,7 @@ class NetworkEngine{
                     
                     completed(.success(pokemonEvolutionChain))
                 }catch {
-                    print("JSON Error \(error.localizedDescription)")
+                    //print("JSON Error \(error.localizedDescription)")
                     completed(.failure(.invalidData))
                 }
             }

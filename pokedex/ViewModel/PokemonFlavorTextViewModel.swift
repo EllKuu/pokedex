@@ -35,7 +35,7 @@ struct PokemonFlavorTextViewModel{
             idx = 0
         }
         flavorText = englishText[idx]
-        print(flavorText)
+        //print(flavorText)
         
     }
     

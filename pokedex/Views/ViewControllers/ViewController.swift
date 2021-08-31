@@ -100,7 +100,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     func updateUI(){
         if isWaiting{
-            print("API running")
+            //print("API running")
         }else{
             activityIndicator.stopAnimating()
             setupNavigationAndSearchbar()
@@ -149,15 +149,15 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
                                 strongSelf.isWaiting = false
                                 
                             case .failure(let error):
-                                print("Details - \(error.rawValue)")
-                                self?.pokemonErrorAlertUser(title: "Error", message: error.rawValue)
+                                //print("Details - \(error.rawValue)")
+                                strongSelf.pokemonErrorAlertUser(title: "Error", message: error.rawValue, refresh: strongSelf.fetchData())
                             }
                         }
                     }// end of getPokemonDetails
                 
                 case .failure(let error):
-                    print("PokemonList - \(error.rawValue)")
-                    self?.pokemonErrorAlertUser(title: "Error", message: error.rawValue)
+                    //print("PokemonList - \(error.rawValue)")
+                    strongSelf.pokemonErrorAlertUser(title: "Error", message: error.rawValue, refresh: strongSelf.fetchData())
                 }
             }
         }// end of getPokemonList
@@ -213,12 +213,10 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     func updateSearchResults(for searchController: UISearchController) {
         guard let text = searchController.searchBar.text else { return }
-        print(text)
         filterPokemonForSearchText(text)
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        print("search began")
         if searchBar.searchTextField.text == "" {
             searchResultsController.showsSearchResultsController = true
         }
@@ -238,14 +236,12 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        print("search clicked")
         searchResultsController.showsSearchResultsController = false
     }
     
     
     
     func filterPokemonForSearchText(_ searchText: String){
-        print("filtering")
         filteredPokemonDetailsArray = pokemonDetailsArray.filter({ (pokemon: PokemonDetails) -> Bool in
             let type = pokemon.types.contains { pokemon in
                 pokemon.type.name.lowercased() == searchText.lowercased()

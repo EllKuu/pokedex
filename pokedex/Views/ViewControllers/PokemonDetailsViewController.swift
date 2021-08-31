@@ -100,7 +100,7 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
     
     private func updateUI(){
         if isWaiting{
-            print("API running")
+            //print("API running")
         }else{
             view.backgroundColor = .clear
             activityIndicator.stopAnimating()
@@ -120,11 +120,11 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
                                                 endCoordinate: .unitCoordinate(.bottomRight),
                                                 frame: pokemonView.frame), at: 0)
            
-//            pokemonTableView.layer.insertSublayer(PokemonColors.shared.createPokemonTypesGradient(
-//                                                    colors: pokemonTypeColors,
-//                                                    startCoordinate: .unitCoordinate(.topLeft),
-//                                                    endCoordinate: .unitCoordinate(.bottomRight),
-//                                                    frame: pokemonTableView.frame), at: 0)
+            pokemonTableView.layer.insertSublayer(PokemonColors.shared.createPokemonTypesGradient(
+                                                    colors: pokemonTypeColors,
+                                                    startCoordinate: .unitCoordinate(.topRight),
+                                                    endCoordinate: .unitCoordinate(.bottomLeft),
+                                                    frame: pokemonTableView.frame), at: 0)
         }
     }
     
@@ -190,15 +190,15 @@ class PokemonDetailsViewController: UIViewController, UITableViewDataSource, UIT
                                 strongSelf.pokemonEvolutionDetails = pokemonEvolution
                                 strongSelf.isWaiting = false
                             case .failure(let error):
-                                print("evolution - \(error.rawValue)")
-                                self?.pokemonErrorAlertUser(title: "Error", message: error.rawValue)
+                                //print("evolution - \(error.rawValue)")
+                                strongSelf.pokemonErrorAlertUser(title: "Error", message: error.rawValue, refresh: strongSelf.fetchData(speciesUrl: strongSelf.pokemonDetail!))
                             }
                         }
                     }
                     
                 case .failure(let error):
-                    print("species - \(error.rawValue)")
-                    self?.pokemonErrorAlertUser(title: "Error", message: error.rawValue)
+                    //print("species - \(error.rawValue)")
+                    strongSelf.pokemonErrorAlertUser(title: "Error", message: error.rawValue, refresh: strongSelf.fetchData(speciesUrl: strongSelf.pokemonDetail!))
                 }
             }
         }
