@@ -38,6 +38,7 @@ class SearchResultsViewController: UIViewController, UICollectionViewDelegate, U
     let pokemonTypeCategory: [String] = ["bug", "dark", "dragon", "electric", "fairy", "fighting", "fire", "flying", "ghost", "grass", "ground", "ice", "normal", "poison", "psychic", "rock", "steel", "water"]
     
     let pokemonRegions: [String] = ["kanto", "johto", "hoenn", "sinnoh", "unova", "kalos", "alola", "galar"]
+    
     let pokemonRegionImage: [String] = ["circle", "capsule", "triangle", "square","rectangle.portrait", "diamond", "hexagon", "shield" ]
     
     var delegate:SelectedCategoryProtocol?
@@ -49,14 +50,19 @@ class SearchResultsViewController: UIViewController, UICollectionViewDelegate, U
         let layout = UICollectionViewFlowLayout()
         let cellWidthHeightConstant: CGFloat = view.frame.size.width / 5
         
-        layout.sectionInset = UIEdgeInsets(top: 10,
-                                           left: 5,
-                                           bottom: 10,
-                                           right: 5)
+        layout.sectionInset = UIEdgeInsets(
+            top: 10,
+            left: 5,
+            bottom: 10,
+            right: 5
+        )
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 1
         layout.minimumLineSpacing = 1
-        layout.itemSize = CGSize(width: cellWidthHeightConstant, height: cellWidthHeightConstant)
+        layout.itemSize = CGSize(
+            width: cellWidthHeightConstant,
+            height: cellWidthHeightConstant
+        )
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         

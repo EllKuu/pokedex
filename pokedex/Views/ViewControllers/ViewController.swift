@@ -10,7 +10,7 @@ import Foundation
 
 class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate, SelectedCategoryProtocol, UIScrollViewDelegate {
     
-   // MARK: Properties and UIComponents
+    // MARK: Properties and UIComponents
     var pokemonListResult: PokemonList?
     private var pokemonDetailsArray = [PokemonDetails]()
     var filteredPokemonDetailsArray = [PokemonDetails]()
@@ -33,10 +33,12 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         let layout = UICollectionViewFlowLayout()
         let cellWidthHeightConstant: CGFloat = view.frame.size.width / 2.5
         
-        layout.sectionInset = UIEdgeInsets(top: 0,
-                                           left: 5,
-                                           bottom: 0,
-                                           right: 5)
+        layout.sectionInset = UIEdgeInsets(
+            top: 0,
+            left: 5,
+            bottom: 0,
+            right: 5
+        )
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 2
         layout.minimumLineSpacing = 6
@@ -63,11 +65,11 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         return indicator
     }()
     
-
+    
     let resultsController = SearchResultsViewController()
     var searchResultsController = UISearchController()
     var searchController = UISearchController()
-
+    
     // MARK: Loading and Setup
     
     override func viewDidLoad() {
@@ -154,7 +156,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
                             }
                         }
                     }// end of getPokemonDetails
-                
+                    
                 case .failure(let error):
                     //print("PokemonList - \(error.rawValue)")
                     strongSelf.pokemonErrorAlertUser(title: "Error", message: error.rawValue, refresh: strongSelf.fetchData())
