@@ -30,6 +30,7 @@
 		B29D720626C0559A00469FB6 /* PokemonColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29D720526C0559A00469FB6 /* PokemonColors.swift */; };
 		B29D720826C160DD00469FB6 /* PokemonFlavorTextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29D720726C160DD00469FB6 /* PokemonFlavorTextTableViewCell.swift */; };
 		B29D720A26C167FD00469FB6 /* PokemonFlavorTextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29D720926C167FD00469FB6 /* PokemonFlavorTextViewModel.swift */; };
+		B2D9072427C29241007F5D61 /* pokeapi.json in Resources */ = {isa = PBXBuildFile; fileRef = B2D9072327C29241007F5D61 /* pokeapi.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,7 @@
 		B29D720526C0559A00469FB6 /* PokemonColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonColors.swift; sourceTree = "<group>"; };
 		B29D720726C160DD00469FB6 /* PokemonFlavorTextTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonFlavorTextTableViewCell.swift; sourceTree = "<group>"; };
 		B29D720926C167FD00469FB6 /* PokemonFlavorTextViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonFlavorTextViewModel.swift; sourceTree = "<group>"; };
+		B2D9072327C29241007F5D61 /* pokeapi.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = pokeapi.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +150,7 @@
 		B220EEC126A4A25500971BAC /* pokedexTests */ = {
 			isa = PBXGroup;
 			children = (
+				B2D9072227C291FD007F5D61 /* Fixtures */,
 				B220EEC226A4A25500971BAC /* pokedexTests.swift */,
 				B220EEC426A4A25500971BAC /* Info.plist */,
 			);
@@ -227,6 +230,14 @@
 				B2388BE726D55F9D0098D075 /* SearchCategoryCollectionViewCell.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		B2D9072227C291FD007F5D61 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				B2D9072327C29241007F5D61 /* pokeapi.json */,
+			);
+			path = Fixtures;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -342,6 +353,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2D9072427C29241007F5D61 /* pokeapi.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
